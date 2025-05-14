@@ -1,9 +1,11 @@
 package com.example.TinTin.service;
 
 import com.example.TinTin.domain.User;
+import com.example.TinTin.domain.response.user.UserCreateDto;
 import com.example.TinTin.repository.UserRepository;
 import com.example.TinTin.util.error.DuplicateResourceException;
 import com.example.TinTin.util.error.NotFoundException;
+import com.example.TinTin.util.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +20,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User handleCreateUser(User user){
+    public UserCreateDto handleCreateUser(User user){
         if(this.userRepository.existsByEmail(user.getEmail())){
             throw new DuplicateResourceException("User with email " + user.getEmail() + " already exists");
         }
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 
-        return this.userRepository.save(user);
+        return UserMapper.toUserCreateDto(this.userRepository.save(user));
     }
 
     public User handleGetUserByUserName(String email){

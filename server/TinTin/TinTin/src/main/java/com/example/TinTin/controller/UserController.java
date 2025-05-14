@@ -1,6 +1,7 @@
 package com.example.TinTin.controller;
 
 import com.example.TinTin.domain.User;
+import com.example.TinTin.domain.response.user.UserCreateDto;
 import com.example.TinTin.service.UserService;
 import com.example.TinTin.util.annotation.ApiMessage;
 import jakarta.validation.Valid;
@@ -24,7 +25,7 @@ public class UserController {
 
     @PostMapping("/users")
     @ApiMessage("Creat a new user")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user){
+    public ResponseEntity<UserCreateDto> createUser(@Valid @RequestBody User user){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.handleCreateUser(user));
     }

@@ -3,6 +3,7 @@ package com.example.TinTin.controller;
 import com.example.TinTin.domain.User;
 import com.example.TinTin.domain.request.ReqLoginDTO;
 import com.example.TinTin.domain.response.ResLoginDTO;
+import com.example.TinTin.domain.response.user.UserCreateDto;
 import com.example.TinTin.service.UserService;
 import com.example.TinTin.util.SecurityUtil;
 import com.example.TinTin.util.annotation.ApiMessage;
@@ -153,6 +154,11 @@ public class AuthController {
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
+    }
+    @PostMapping("/auth/register")
+    @ApiMessage("Register account")
+    public ResponseEntity<UserCreateDto> register(@Valid @RequestBody User user){
+        return ResponseEntity.status(201).body(this.userService.handleCreateUser(user));
     }
 
 }
