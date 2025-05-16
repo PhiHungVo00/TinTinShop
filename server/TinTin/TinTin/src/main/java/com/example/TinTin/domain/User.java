@@ -2,6 +2,7 @@ package com.example.TinTin.domain;
 
 import com.example.TinTin.util.SecurityUtil;
 import com.example.TinTin.util.constrant.GenderEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -47,6 +49,18 @@ public class User {
     private String createdBy;
     private String updatedBy;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<AddressUser> addressUsers;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> orders;
+
     @PrePersist
     public void preCreateUser(){
         this.createdAt = Instant.now();
@@ -58,13 +72,4 @@ public class User {
         this.updatedAt = Instant.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent()?SecurityUtil.getCurrentUserLogin().get():"";
     }
-
-
-
-
-
-
-
-    
-
 }
