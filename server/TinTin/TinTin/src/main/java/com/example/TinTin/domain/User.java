@@ -24,7 +24,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Tên không được để trống.")
     private String name;
@@ -35,8 +35,8 @@ public class User {
     @NotBlank(message = "Password không được để trống")
     private String password;
 
-    private long phone;
-    private int age;
+    private Long phone;
+    private Integer age;
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;
     private LocalDate birthdate;

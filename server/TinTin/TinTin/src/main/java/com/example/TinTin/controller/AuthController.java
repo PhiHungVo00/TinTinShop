@@ -58,11 +58,12 @@ public class AuthController {
             userLogin.setId(currentUserLogin.getId());
             userLogin.setUserName(currentUserLogin.getName());
             userLogin.setEmail(currentUserLogin.getEmail());
+            userLogin.setRole(currentUserLogin.getRole());
             resLoginDTO.setUser(userLogin);
         }
 
         //Create token
-        String accessToken = this.securityUtil.createAccessToken(authentication.getName(), resLoginDTO.getUser());
+        String accessToken = this.securityUtil.createAccessToken(authentication.getName(), resLoginDTO);
         resLoginDTO.setAccessToken(accessToken);
 
         //Create refresh token
@@ -111,10 +112,11 @@ public class AuthController {
             userLogin.setId(currentUserLogin.getId());
             userLogin.setUserName(currentUserLogin.getName());
             userLogin.setEmail(currentUserLogin.getEmail());
+            userLogin.setRole(currentUserLogin.getRole());
             resLoginDTO.setUser(userLogin);
         }
         //Create token
-        String accessToken = this.securityUtil.createAccessToken(email, resLoginDTO.getUser());
+        String accessToken = this.securityUtil.createAccessToken(email, resLoginDTO);
         resLoginDTO.setAccessToken(accessToken);
 
         //Create refresh token
@@ -161,4 +163,10 @@ public class AuthController {
         return ResponseEntity.status(201).body(this.userService.handleCreateUser(user));
     }
 
+    @GetMapping("/auth/account")
+    @ApiMessage("Fetch account")
+    public ResponseEntity<ResLoginDTO.UserGetAccount> getAccount() {
+        ResLoginDTO.UserGetAccount userLogin = this.userService.getUserLogin();
+        return ResponseEntity.ok().body(userLogin);
+    }
 }

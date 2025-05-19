@@ -22,7 +22,7 @@ public class OrderDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -33,18 +33,18 @@ public class OrderDetail {
     private ProductSize productSize;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(nullable = false, name = "total_price")
-    private long totalPrice;
+    private Long totalPrice;
 
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
-    @ManyToMany
-    @JsonIgnoreProperties("orderDetails")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(  value = {"orderDetails"})
     @JoinTable(name = "order_detail_topping",
             joinColumns = @JoinColumn(name = "order_detail_id"),
             inverseJoinColumns = @JoinColumn(name = "topping_id"))

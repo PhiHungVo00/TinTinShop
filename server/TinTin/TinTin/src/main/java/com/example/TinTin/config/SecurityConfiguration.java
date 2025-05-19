@@ -38,7 +38,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http.csrf(c->c.disable())
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(authz -> authz.requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/refresh","/api/v1/auth/register", "/storage/**", "/api/v1/users")
+                .authorizeHttpRequests(authz -> authz.requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/refresh","/api/v1/auth/register", "/storage/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

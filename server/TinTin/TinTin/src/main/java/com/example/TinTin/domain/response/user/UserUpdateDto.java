@@ -1,11 +1,7 @@
 package com.example.TinTin.domain.response.user;
 
-
-
-
 import com.example.TinTin.util.constrant.GenderEnum;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,9 +11,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
-public class UserCreateDto {
+public class UserUpdateDto {
     private Long id;
     private String name;
     private String email;
@@ -26,15 +20,7 @@ public class UserCreateDto {
     private GenderEnum gender;
     private LocalDate birthdate;
     private String avatar;
-    private Instant createdAt;
-    private String createdBy;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Role{
-        private long id;
-        private String name;
-    }
+    private Instant updatedAt;
+    private String updatedBy;
+    private UserCreateDto.Role role;
 }
-

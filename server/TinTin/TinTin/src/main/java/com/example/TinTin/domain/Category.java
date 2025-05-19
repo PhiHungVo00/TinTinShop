@@ -22,12 +22,12 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Tên loại không được để trống")
     private String name;
 
-    private boolean isActive;
+    private Boolean active;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;

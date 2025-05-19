@@ -23,7 +23,7 @@ public class Topping {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Tên toppping không được để trống")
     private String name;
@@ -32,7 +32,7 @@ public class Topping {
     private String description;
 
     @Column(nullable = false)
-    private long price;
+    private Long price;
 
     @Enumerated(EnumType.STRING)
     private ToppingStatusEnum status;

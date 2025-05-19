@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Tên role không được để trống")
     private String name;
@@ -33,7 +30,8 @@ public class Role {
     private String description;
 
     @NotBlank(message = "Trạng thái active không được để trống")
-    private boolean Active;
+    private Boolean active;
+
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
@@ -44,7 +42,7 @@ public class Role {
     private List<User> users;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"roles"})
+    @JsonIgnoreProperties(value = {"roles"})
     @JoinTable(name = "roles_permissions",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))
@@ -61,4 +59,6 @@ public class Role {
         this.updatedAt = Instant.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
     }
+
+
 }
