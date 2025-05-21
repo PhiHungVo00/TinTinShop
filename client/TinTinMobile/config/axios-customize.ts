@@ -1,32 +1,47 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
+let showLoading: () => void;
+let hideLoading: () => void;
+
+export const setLoadingHandler = (handlers: {
+  showLoading: () => void;
+  hideLoading: () => void;
+}) => {
+  showLoading = handlers.showLoading;
+  hideLoading = handlers.hideLoading;
+};
+
 const instance = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
 });
-// Add a request interceptor
+
+// Request Interceptor
 instance.interceptors.request.use(
   async (config) => {
-    const token = await AsyncStorage.getItem('access_token');
-    if (token) {
+    showLoading?.();
+    await new Promise((r) => setTimeout(r, 5000));
+    const token = await AsyncStorage.getItem("access_token");
+    console.log("token", token);
+    if (token != null) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    hideLoading?.();
+    return Promise.reject(error);
+  }
 );
 
-// Add a response interceptor
+// Response Interceptor
 instance.interceptors.response.use(
-  function (response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    if (response.data) return response.data;
-    return response;
+  (response) => {
+    hideLoading?.();
+    return response.data ?? response;
   },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
+  (error) => {
+    hideLoading?.();
     return error?.response?.data ?? Promise.reject(error);
   }
 );
