@@ -14,15 +14,18 @@ import {
     Platform,
     ScrollView,
     TouchableOpacity,
+    ImageBackground
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { validateEmail, validatePassword } from "@/service/validate";
-import { registerApi } from "@/config/api";
+import { callRegister } from "@/config/api";
+import Toast from "react-native-toast-message";
 const image = {
     facebook: require("@/assets/images/Facebook.png"),
     google: require("@/assets/images/Google.png"),
     logo: require("@/assets/images/logo.jpg"),
+    background: require("@/assets/images/background.jpg"),
 };
 
 const styles = StyleSheet.create({
@@ -76,41 +79,74 @@ const SignUpScreen = () => {
         
     }
     const handleSignUp = async () => {
+        // Reset lỗi trước
+        setNameError("");
+        setEmailError("");
+        setPasswordError("");
+        setConfirmPasswordError("");
+    
+        let hasError = false;
+    
         if (!name) {
-            setNameError("Name is không được để trống");
+            setNameError("Name không được để trống");
+            hasError = true;
         }
+    
         if (!email) {
-            setEmailError("Email is không được để trống");
-        }else{   
-        if (!validateEmail(email).isValid) {
-            setEmailError(validateEmail(email).message);
+            setEmailError("Email không được để trống");
+            hasError = true;
+        } else {
+            const emailValidation = validateEmail(email);
+            if (!emailValidation.isValid) {
+                setEmailError(emailValidation.message);
+                hasError = true;
+            }
         }
-        }
+    
         if (!password) {
-            setPasswordError("Password is không được để trống");
-        }else{
-            if (!validatePassword(password).isValid) {
-                setPasswordError(validatePassword(password).message);
+            setPasswordError("Password không được để trống");
+            hasError = true;
+        } else {
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.isValid) {
+                setPasswordError(passwordValidation.message);
+                hasError = true;
             }
         }
+    
         if (!confirmPassword) {
-            setConfirmPasswordError("Confirm Password is không được để trống");
-        }else{
-            if (password !== confirmPassword) {
-                setConfirmPasswordError("Confirm Password không khớp");
-            }
+            setConfirmPasswordError("Confirm Password không được để trống");
+            hasError = true;
+        } else if (password !== confirmPassword) {
+            setConfirmPasswordError("Confirm Password không khớp");
+            hasError = true;
         }
-       
-        
-        if (!nameError && !emailError && !passwordError && !confirmPasswordError) {
-            const res = await registerApi(name, email, password);
-                alert(res.message);
+    
+        if (hasError) return;
+        const res = await callRegister(name, email, password);
+    
+        if (res.data) {
+            Toast.show({
+                type: "success",
+                text1: "Đăng ký thành công",
+            });
+            router.replace("./SignInScreen");
             setName("");
             setEmail("");
             setPassword("");
             setConfirmPassword("");
+        } else {
+            let message = "Đăng ký thất bại";
+            if (res.error?.includes("already exists")) {
+                message = "Email đã tồn tại";
+            }
+            Toast.show({
+                type: "error",
+                text1: message,
+            });
         }
     };
+    
 
     const handleNameChange = (text: string) => {
         setName(text);
@@ -141,7 +177,8 @@ const SignUpScreen = () => {
     };
 
     return (
-        <KeyboardAvoidingView
+        <ImageBackground source={image.background} style={{ flex: 1 }}>
+             <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
 
@@ -257,6 +294,8 @@ const SignUpScreen = () => {
                 
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
+        </ImageBackground>
+       
     );
 };
 
