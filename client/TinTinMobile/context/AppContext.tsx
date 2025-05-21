@@ -1,5 +1,5 @@
 
-import { IAccount } from '@/types/backend';
+import { IAccount, IGetAccount } from '@/types/backend';
 import React, { createContext, useContext, useState } from 'react';
 
 
@@ -7,15 +7,15 @@ import React, { createContext, useContext, useState } from 'react';
 interface AppContextType {
     theme: string,
     setTheme: (theme: string) => void,
-    user: IAccount | null,
-    setUser: (user: IAccount ) => void,
+    user: IGetAccount | null,
+    setUser: (user: IGetAccount ) => void,
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<string>('light');
-  const [user, setUser] = useState<IAccount | null>(null);
+  const [user, setUser] = useState<IGetAccount | null>(null);
 
   return (
     <AppContext.Provider value={{ theme, setTheme, user, setUser }}>

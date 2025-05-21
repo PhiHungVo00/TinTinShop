@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import Toast from "react-native-toast-message";
 import CustomToast from "@/components/CustomToast";
 import { AppProvider } from "@/context/AppContext";
+
 export default function RootLayout() {
   const toastConfig = {
     success: (props: any) => <CustomToast {...props} type="success" />,

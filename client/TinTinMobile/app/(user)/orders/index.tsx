@@ -1,11 +1,11 @@
 import { View, Text } from "react-native"
 
-const HomeScreen = () => {
+const OrderScreen = () => {
     return (
         <View>
-            <Text>Home screen</Text>
+            <Text>Orders screen</Text>
         </View>
     )
 }
 
-export default HomeScreen;
+export default OrderScreen;

@@ -3,11 +3,13 @@ import { Tabs } from "expo-router"
 
 const UserLayout = () => {
     return (
-        <Tabs>
-            <Tabs.Screen name="home" options={ {
-               headerShown: false,
-            }} />
-            <Tabs.Screen name="favorites" options={{ headerShown: false }} />
+        <Tabs screenOptions={{
+            headerShown: false,
+        }}>
+            <Tabs.Screen name="home/index"/>
+            <Tabs.Screen name="favorites/index" />
+            <Tabs.Screen name="orders/index"/>
+            <Tabs.Screen name="notification/index"/>
         </Tabs>
     )
 }

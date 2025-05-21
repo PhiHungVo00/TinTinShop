@@ -22,10 +22,10 @@ import { validateEmail, validatePassword } from "@/service/validate";
 import { callRegister } from "@/config/api";
 import Toast from "react-native-toast-message";
 const image = {
-    facebook: require("@/assets/images/Facebook.png"),
-    google: require("@/assets/images/Google.png"),
-    logo: require("@/assets/images/logo.jpg"),
-    background: require("@/assets/images/background.jpg"),
+    facebook: require("@/assets/images/auth/Facebook.png"),
+    google: require("@/assets/images/auth/Google.png"),
+    logo: require("@/assets/images/auth/logo.jpg"),
+    background: require("@/assets/images/auth/background.jpg"),
 };
 
 const styles = StyleSheet.create({
