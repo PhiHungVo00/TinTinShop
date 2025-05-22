@@ -94,9 +94,9 @@ const SignInScreen = () => {
       const token = res.data.access_token;
       await AsyncStorage.setItem("access_token", token); 
       if(res.data.user.role?.name.toLowerCase() === 'admin'){
-        router.replace("../(admin)/dashboard");
+        router.replace("/(admin)/dashboard");
       } else {
-            router.replace("../(user)/home");
+            router.replace("/(user)/home");
           }
     } else {
       Toast.show({

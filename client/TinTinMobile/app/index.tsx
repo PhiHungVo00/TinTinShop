@@ -5,9 +5,11 @@ import { callFetchAccount } from '@/config/api';
 import { useAppContext } from '@/context/AppContext';
 import { View } from 'react-native';
 
+
 SplashScreen.preventAutoHideAsync();
 
 const RootPage = () => {
+
   const router = useRouter();
   const { setUser } = useAppContext();
   const [appIsReady, setAppIsReady] = useState(false);
@@ -19,12 +21,12 @@ const RootPage = () => {
         if (res.data) {
           setUser(res.data);
           if (res.data.user.role?.name.toLowerCase() === 'admin') {
-            router.replace('./(admin)/dashboard');
+            router.replace('/(admin)/dashboard');
           } else {
-            router.replace('./(user)/home');
+            router.replace('/(user)/home');
           }
         } else {
-          router.replace('./(auth)/WelcomeScreen');
+          router.replace('/(auth)/WelcomeScreen');
         }
       } catch (e) {
         console.warn(e);

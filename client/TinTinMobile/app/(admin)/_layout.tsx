@@ -11,8 +11,8 @@ const TabLayout = () => {
             tabBarInactiveTintColor: "gray",
             tabBarStyle: {
               backgroundColor: COLORS.BACKGROUND,
-
-          }
+            },
+            
             
         }}>
         <Tabs.Screen name="dashboard/index" options={{ 

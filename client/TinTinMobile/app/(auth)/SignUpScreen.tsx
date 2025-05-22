@@ -130,7 +130,7 @@ const SignUpScreen = () => {
                 type: "success",
                 text1: "Đăng ký thành công",
             });
-            router.replace("./SignInScreen");
+            router.replace("/(auth)/SignInScreen");
             setName("");
             setEmail("");
             setPassword("");
