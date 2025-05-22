@@ -22,7 +22,6 @@ instance.interceptors.request.use(
     showLoading?.();
     await new Promise((r) => setTimeout(r, 5000));
     const token = await AsyncStorage.getItem("access_token");
-    console.log("token", token);
     if (token != null) {
       config.headers.Authorization = `Bearer ${token}`;
     }

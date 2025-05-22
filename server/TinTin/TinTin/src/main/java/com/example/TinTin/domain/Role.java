@@ -29,7 +29,6 @@ public class Role {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
-    @NotBlank(message = "Trạng thái active không được để trống")
     private Boolean active;
 
     private Instant createdAt;

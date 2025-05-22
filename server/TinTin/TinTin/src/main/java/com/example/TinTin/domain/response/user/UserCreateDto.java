@@ -26,6 +26,7 @@ public class UserCreateDto {
     private GenderEnum gender;
     private LocalDate birthdate;
     private String avatar;
+    private Role role;
     private Instant createdAt;
     private String createdBy;
 

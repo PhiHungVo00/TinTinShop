@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
 const WelcomeScreen = () => {
 
   const handleSignIn = () => {
-    router.push("/SignInScreen")
+    router.push("./SignInScreen")
   }
 
   return (

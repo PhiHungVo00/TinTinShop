@@ -4,6 +4,7 @@ import com.example.TinTin.domain.User;
 import com.example.TinTin.domain.response.ResultPaginationDTO;
 import com.example.TinTin.domain.response.user.UserCreateDto;
 import com.example.TinTin.domain.response.user.UserResponseDto;
+import com.example.TinTin.domain.response.user.UserUpdateDto;
 import com.example.TinTin.service.UserService;
 import com.example.TinTin.util.annotation.ApiMessage;
 import com.turkraft.springfilter.boot.Filter;
@@ -45,5 +46,23 @@ public class UserController {
 
     }
 
+    @PutMapping("/users")
+    @ApiMessage("update a user")
+    public ResponseEntity<UserUpdateDto> updateUser(@Valid @RequestBody User user){
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleUpdateUser(user));
+    }
+
+    @DeleteMapping("/users/{id}")
+    @ApiMessage("Delete a user")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") long id){
+        this.userService.deleteUser(id);
+        return ResponseEntity.ok().body(null);
+    }
+
+    @GetMapping("/users/{id}")
+    @ApiMessage("fetch user by id")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable("id") long id){
+        return ResponseEntity.ok().body(this.userService.getUserById(id));
+    }
 
 }
