@@ -21,10 +21,10 @@ public class UserCreateDto {
     private Long id;
     private String name;
     private String email;
-    private Long phone;
+    private String phone;
     private Integer age;
     private GenderEnum gender;
-    private LocalDate birthdate;
+    private String birthdate;
     private String avatar;
     private Role role;
     private Instant createdAt;

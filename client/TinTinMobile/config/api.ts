@@ -1,4 +1,4 @@
-import { IAccount, IBackendRes, IGetAccount, IUser } from "@/types/backend"
+import { IAccount, IBackendRes, IFile, IGetAccount, IUser } from "@/types/backend"
 import axios from "./axios-customize"
 
 /**
@@ -27,9 +27,25 @@ export const callLogout = () => {
 
 /**
  * 
+Module Upload
+ */
+export const callUploadFile = (formData: FormData) => {
+    return axios.post<IBackendRes<IFile>>('/api/v1/files', formData)
+}
+
+export const callGetFile = (fileName: string, folder: string) => {
+    return axios.get<IBackendRes<IFile>>(`/api/v1/files/${fileName}?folder=${folder}`)
+}
+
+/**
+ * 
 Module User
  */
 export const callGetUser = (id: string) => {
     return axios.get<IBackendRes<IUser>>(`/api/v1/users/${id}`)
+}
+
+export const callUpdateUser = (user: IUser) => {
+    return axios.put<IBackendRes<IUser>>(`/api/v1/users`, user)
 }
 

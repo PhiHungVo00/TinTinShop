@@ -42,7 +42,7 @@ export interface IUser {
   name: string;
   email: string;
   password?: string;
-  phone: number;
+  phone: string;
   age: number;
   gender: string;
   birthday: string;
@@ -55,4 +55,9 @@ export interface IUser {
   createdAt?: string;
   updatedAt?: string;
   updatedBy?: string;
+}
+
+export interface IFile {
+    fileName: string;
+    uploadTime: string;
 }

@@ -1,5 +1,5 @@
 import { COLORS } from "@/util/constant";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, BackHandler, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, BackHandler, Platform, RefreshControl } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -9,14 +9,14 @@ import AccessControl from "@/components/AccessControl";
 import IconCard from "@/components/IconCard";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useAppContext } from "@/context/AppContext";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { callGetUser, callLogout } from "@/config/api";
 import { IUser } from "@/types/backend";
 import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import * as Haptics from 'expo-haptics';
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };
@@ -26,28 +26,35 @@ const PORT = process.env.EXPO_PUBLIC_PORT;
 const image_url_base = `http://${IPV4}:${PORT}/storage`;
 
 const SettingScreen = () => {
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+        const fetchUser = async (id: string) => {
+            try {
+                setRefreshing(true); 
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+                const res = await callGetUser(id);
+                if (res.data) {
+                    setUserData(res.data);
+                    console.log(res.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi fetch user:", error);
+                Toast.show({ text1: "Lỗi khi tải dữ liệu", type: "error" });
+            } finally {
+                setRefreshing(false);
+            }
+        };
+    
+        if (user?.user.id) {
+            fetchUser(user.user.id);
+        }
+    }, []);
+    
     const { user, setUser } = useAppContext();
     const [userData, setUserData] = useState<IUser>();
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-
-    const handleLogoutConfirm = () => {
-        Alert.alert(
-            "Xác nhận đăng xuất",
-            "Bạn có chắc chắn muốn đăng xuất?",
-            [
-                {
-                    text: "Hủy",
-                    style: "cancel",
-                },
-                {
-                    text: "Đăng xuất",
-                    style: "destructive",
-                    onPress: handleLogout,
-                },
-            ],
-            { cancelable: true }
-        );
-    };
 
     const handleLogout = async () => {
         setShowLogoutDialog(false);
@@ -70,6 +77,26 @@ const SettingScreen = () => {
         }
     };
 
+    const handleProfile = () => {
+        const jsonStr = encodeURIComponent(JSON.stringify(userData));
+
+        router.push({
+            pathname: "../../profile",
+            params: {
+                userDataStr: jsonStr,
+            },
+        });
+
+    }
+
+    const handleAddress = () => {
+        Alert.alert("Chức năng đang phát triển");
+    }
+
+    const handleStore = () => {
+        Alert.alert("Chức năng đang phát triển");
+    }
+
     useEffect(() => {
         const fetchUser = async (id: string) => {
             const res = await callGetUser(id);
@@ -83,7 +110,13 @@ const SettingScreen = () => {
     }, []);
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <ScrollView 
+            style={styles.container} 
+            contentContainerStyle={styles.contentContainer}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+        >
             <View style={styles.profileContainer}>
                 <View style={styles.profile}>
                     <Image
@@ -96,9 +129,24 @@ const SettingScreen = () => {
                     </View>
                 </View>
                 <View style={styles.flashGroup}>
-                    <IconCard icon={<AntDesign name="form" size={24} color={COLORS.ITEM_TEXT} />} title="Thông tin" onPress={() => { }} textStyle={{ color: COLORS.ITEM_TEXT }} />
-                    <IconCard icon={<Feather name="map-pin" size={24} color={COLORS.ITEM_TEXT} />} title="Địa chỉ" onPress={() => { }} textStyle={{ color: COLORS.ITEM_TEXT }} />
-                    <IconCard icon={<MaterialIcons name="store" size={24} color={COLORS.ITEM_TEXT} />} title="Cửa hàng" onPress={() => { }} textStyle={{ color: COLORS.ITEM_TEXT }} />
+                    <IconCard 
+                      icon={<AntDesign name="form" size={24} color={COLORS.ITEM_TEXT} />} 
+                      title="Thông tin" 
+                        onPress={handleProfile} 
+                      textStyle={{ color: COLORS.ITEM_TEXT }} 
+                    />
+                    <IconCard 
+                      icon={<Feather name="map-pin" size={24} color={COLORS.ITEM_TEXT} />} 
+                      title="Địa chỉ" 
+                      onPress={handleAddress} 
+                      textStyle={{ color: COLORS.ITEM_TEXT }} 
+                    />
+                    <IconCard 
+                        icon={<MaterialIcons name="store" size={24} color={COLORS.ITEM_TEXT} />} 
+                        title="Cửa hàng" 
+                        onPress={handleStore} 
+                        textStyle={{ color: COLORS.ITEM_TEXT }} 
+                    />
                 </View>
             </View>
 

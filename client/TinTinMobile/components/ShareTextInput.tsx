@@ -37,7 +37,7 @@ const ShareTextInput = ({
           style={[
             styles.label,
             textStyle,
-            { color: isFocused ? "#000" : "#666" },
+            { color:  "#ccc" },
           ]}
         >
           {title}
@@ -49,7 +49,7 @@ const ShareTextInput = ({
             styles.input,
             inputStyle,
             {
-              borderColor: error ? "red" : isFocused ? "#000" : "#ccc",
+              borderColor: error ? "red" : isFocused ? "orange" : "#ccc",
             },
           ]}
           onFocus={() => setIsFocused(true)}

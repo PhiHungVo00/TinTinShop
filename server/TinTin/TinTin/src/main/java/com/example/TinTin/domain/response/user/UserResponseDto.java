@@ -15,10 +15,10 @@ public class UserResponseDto {
     private Long id;
     private String name;
     private String email;
-    private Long phone;
+    private String phone;
     private Integer age;
     private GenderEnum gender;
-    private LocalDate birthdate;
+    private String birthdate;
     private String avatar;
     private Instant createdAt;
     private Instant updatedAt;

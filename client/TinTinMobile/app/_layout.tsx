@@ -6,11 +6,11 @@ import CustomToast from "@/components/CustomToast";
 import { AppProvider } from "@/context/AppContext";
 import { COLORS } from "@/util/constant";
 
-// ✅ THÊM CÁC DÒNG SAU
+
 import { LoadingProvider, useLoading } from "@/context/LoadingContext";
 import LoadingModal from "@/components/LoadingModal";
 import { useEffect } from "react";
-import { setLoadingHandler } from "@/config/axios-customize"; // ✅ import hàm cấu hình loading
+import { setLoadingHandler } from "@/config/axios-customize"; 
 
 function WithLoadingHandler() {
   const { showLoading, hideLoading } = useLoading();

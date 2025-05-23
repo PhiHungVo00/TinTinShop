@@ -35,11 +35,11 @@ public class User {
 
     private String password;
 
-    private Long phone;
+    private String phone;
     private Integer age;
     @Enumerated(EnumType.STRING)
     private GenderEnum gender;
-    private LocalDate birthdate;
+    private String birthdate;
     private String avatar;
 
     @Column(columnDefinition = "MEDIUMTEXT")

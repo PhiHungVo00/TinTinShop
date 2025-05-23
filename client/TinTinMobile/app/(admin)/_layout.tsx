@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import { COLORS } from "@/util/constant";
-
+import { Text } from "react-native";
 const TabLayout = () => {
     return (
         <Tabs screenOptions={{
@@ -11,12 +11,11 @@ const TabLayout = () => {
             tabBarInactiveTintColor: "gray",
             tabBarStyle: {
               backgroundColor: COLORS.BACKGROUND,
+              paddingTop: 10,
             },
-            
-            
         }}>
         <Tabs.Screen name="dashboard/index" options={{ 
-          title: 'Dashboard',
+          title: 'Home',
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="home" color={color} size={size} />
           ),
