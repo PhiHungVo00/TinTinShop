@@ -28,6 +28,7 @@ public class Topping {
     @NotBlank(message = "Tên toppping không được để trống")
     private String name;
 
+    private String image;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
