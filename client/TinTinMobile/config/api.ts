@@ -22,5 +22,14 @@ export const callRefreshToken = () => {
 }
 
 export const callLogout = () => {
-    return axios.post<IBackendRes<string>>('/api/v1/auth/logout')
+    return axios.post<IBackendRes<string>|string>('/api/v1/auth/logout')
 }
+
+/**
+ * 
+Module User
+ */
+export const callGetUser = (id: string) => {
+    return axios.get<IBackendRes<IUser>>(`/api/v1/users/${id}`)
+}
+

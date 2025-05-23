@@ -1,6 +1,10 @@
 export const COLORS = {
     GREY: "#F2F2F2",
     BLACK: "#000000",
-    BACKGROUND: "#0F0F0F",
-
+    BACKGROUND: "#18191A",
+    TEXT: "#FFFFFF",
+    ITEM_BACKGROUND: "#242526",
+    CONTENT_ACCORDION: "#3A3B3C",
+    ITEM_TEXT: "#B0B3B8",
+    ITEM_BORDER: "#3A3B3C",
 }

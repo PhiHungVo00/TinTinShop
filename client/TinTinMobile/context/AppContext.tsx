@@ -8,7 +8,7 @@ interface AppContextType {
     theme: string,
     setTheme: (theme: string) => void,
     user: IGetAccount | null,
-    setUser: (user: IGetAccount ) => void,
+    setUser: (user: IGetAccount | null) => void,
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);

@@ -20,9 +20,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { callLogin } from "@/config/api";
+import { callFetchAccount, callLogin } from "@/config/api";
 import Toast from "react-native-toast-message";
-import { IAccount } from "@/types/backend";
+import { IAccount, IGetAccount } from "@/types/backend";
 import { useAppContext } from "@/context/AppContext";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -76,7 +76,7 @@ const SignInScreen = () => {
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
+  const { setUser } = useAppContext();
 
   const handleLogin = async () => {
     if (!email) {
@@ -93,6 +93,10 @@ const SignInScreen = () => {
       });
       const token = res.data.access_token;
       await AsyncStorage.setItem("access_token", token); 
+      const getAccount: IGetAccount = {
+        user: res.data.user,
+      }
+      setUser(getAccount);
       if(res.data.user.role?.name.toLowerCase() === 'admin'){
         router.replace("/(admin)/dashboard");
       } else {

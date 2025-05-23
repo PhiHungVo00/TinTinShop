@@ -1,15 +1,16 @@
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { callFetchAccount } from '@/config/api';
 import { useAppContext } from '@/context/AppContext';
-import { View } from 'react-native';
 
-
-SplashScreen.preventAutoHideAsync();
+// Chỉ gọi preventAutoHide nếu KHÔNG PHẢI iOS
+if (Platform.OS !== 'ios') {
+  SplashScreen.preventAutoHideAsync();
+}
 
 const RootPage = () => {
-
   const router = useRouter();
   const { setUser } = useAppContext();
   const [appIsReady, setAppIsReady] = useState(false);
@@ -31,7 +32,10 @@ const RootPage = () => {
       } catch (e) {
         console.warn(e);
       } finally {
-        await SplashScreen.hideAsync();
+        // Chỉ hide splash nếu KHÔNG PHẢI iOS
+        if (Platform.OS !== 'ios') {
+          await SplashScreen.hideAsync();
+        }
         setAppIsReady(true);
       }
     }

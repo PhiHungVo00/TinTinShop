@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-
+const IPV4 = process.env.EXPO_PUBLIC_IPV4;
+const PORT = process.env.EXPO_PUBLIC_PORT;
 let showLoading: () => void;
 let hideLoading: () => void;
 
@@ -13,14 +14,14 @@ export const setLoadingHandler = (handlers: {
 };
 
 const instance = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  baseURL: `http://${IPV4}:${PORT}`,
 });
 
 // Request Interceptor
 instance.interceptors.request.use(
   async (config) => {
     showLoading?.();
-    await new Promise((r) => setTimeout(r, 5000));
+    await new Promise((r) => setTimeout(r, 2000));
     const token = await AsyncStorage.getItem("access_token");
     if (token != null) {
       config.headers.Authorization = `Bearer ${token}`;
