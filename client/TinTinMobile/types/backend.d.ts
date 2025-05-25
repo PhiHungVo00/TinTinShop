@@ -15,6 +15,12 @@ export interface IModelPaginate<T> {
   result: T[];
 }
 
+export interface IMeta {
+  page: number;
+  pageSize: number;
+  pages: number;
+  total: number;
+}
 export interface IAccount {
   access_token: string;
   user: {
@@ -60,4 +66,26 @@ export interface IUser {
 export interface IFile {
     fileName: string;
     uploadTime: string;
+}
+
+export interface IRole {
+  id: string;
+  name: string;
+  description: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+  permissions: {
+    id: string;
+    name: string;
+    apiPath: string;
+    method: string;
+    module: string;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    updatedBy: string;
+  }[];
 }

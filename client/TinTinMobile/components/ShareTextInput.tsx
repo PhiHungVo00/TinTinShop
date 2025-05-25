@@ -8,6 +8,7 @@ import {
   TextStyle,
   TextInputProps,
   TouchableOpacity,
+  ViewStyle,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -15,8 +16,10 @@ interface IProp extends TextInputProps {
   title?: string;
   inputStyle?: StyleProp<TextStyle>;
   textStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
   isPassword?: boolean;
   error?: string;
+  icon?: React.ReactNode;
 }
 
 const ShareTextInput = ({
@@ -25,13 +28,15 @@ const ShareTextInput = ({
   textStyle,
   isPassword = false,
   error = "",
+  icon,
+  containerStyle,
   ...rest
 }: IProp) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       {title && (
         <Text
           style={[
@@ -69,6 +74,11 @@ const ShareTextInput = ({
             />
           </TouchableOpacity>
         )}
+        {icon && (
+          <View style={styles.icon}>
+            {icon}
+          </View>
+        )}
       </View>
       {error !== "" && <Text style={styles.error}>{error}</Text>}
     </View>
@@ -90,10 +100,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 25,
     paddingRight: 45, 
     fontSize: 16,
     color: "#000",
+    marginHorizontal: 10,
   },
   eyeIcon: {
     position: "absolute",
@@ -104,6 +115,11 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 13,
     marginTop: 4,
+  },
+  icon: {
+    position: "absolute",
+    left: 15,
+    top: 12,
   },
 });
 

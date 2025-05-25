@@ -1,0 +1,249 @@
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from "react-native";
+import { COLORS } from "@/util/constant";
+import HeaderList from "@/components/HeaderList";
+import { router } from "expo-router";
+import SegmentedControl from '@react-native-segmented-control/segmented-control';
+import { useCallback, useEffect, useState } from "react";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Octicons from '@expo/vector-icons/Octicons';
+import ShareTextInput from "@/components/ShareTextInput";
+import ItemUser from "@/components/ItemUser";
+import { callDeleteUser, callGetUsers } from "@/config/api";
+import { IMeta, IUser } from "@/types/backend";
+import EmptyState from "@/components/EmptyState";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import Toast from "react-native-toast-message";
+const IPV4 = process.env.EXPO_PUBLIC_IPV4;
+const PORT = process.env.EXPO_PUBLIC_PORT;
+const image_url_base = `http://${IPV4}:${PORT}/storage`;
+
+const UsersScreen = () => {
+    const selectValues = ['All', 'Admin', 'User', 'Guest'];
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [users, setUsers] = useState<IUser[]>();
+    const [filterRole, setFilterRole] = useState<string>("");
+    const [filterName, setFilterName] = useState<string>("");
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+    const [sort, setSort] = useState<string>("id,asc");
+    const [visible, setVisible] = useState(false);
+    const [itemDelete, setItemDelete] = useState<IUser>();
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const createFilter = (filterName: string, filterRole: string) => {
+        let filter = "";
+        if (filterName.length > 0 && filterRole.length > 0) {
+            filter = `name~'*${filterName}*'` + " and " + filterRole;
+        } else {
+            filterName.length > 0 ? filter = `name~'*${filterName}*'` : filter = filterRole;
+        }
+        return filter;
+    }
+    useEffect(() => {
+        setIsRefreshing(false);
+        const delayDebounce = setTimeout(() => {
+
+            const filter = createFilter(filterName, filterRole);
+
+            fetchUsers({
+                page,
+                size,
+                sort,
+                filter,
+            });
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+    }, [filterRole, filterName, sort, selectedIndex, page, isRefreshing]);
+
+    const fetchUsers = async ({ page, size, sort, filter }: {
+        page: number,
+        size: number,
+        sort?: string,
+        filter?: string
+    }) => {
+        const response = await callGetUsers({ page, size, sort, filter });
+        if (response.data) {
+            setUsers(response.data.result);
+        }
+
+    };
+
+    const handleSelectedIndex = (index: number) => {
+        setSelectedIndex(index);
+        if (index === -1 || index === 0) {
+            setFilterRole("");
+        } else {
+            if (index === 3) {
+                setFilterRole("role.name is null");
+            } else {
+                setFilterRole(`role.name:'${selectValues[index].toLowerCase()}'`);
+            }
+        }
+    }
+
+    const handleViewUser = (item: IUser) => {
+        router.push({
+            pathname: "/management/users/UserDetail",
+            params: {
+                userDataStr: JSON.stringify(item)
+            }
+        })
+    }
+
+
+    const handleConfirmDeleteUser = async (item: IUser) => {
+        if (item.id) {
+            const response = await callDeleteUser(item.id);
+            if (response.statusCode === 200) {
+                Toast.show({
+                    text1: "Xóa người dùng thành công",
+                    type: "success"
+                });
+                setIsRefreshing(true);
+            }
+            else {
+                Toast.show({
+                    text1: "Xóa người dùng thất bại",
+                    type: "error"
+                });
+            }
+        }
+        setVisible(false);
+    }
+
+    
+
+    return (
+        <KeyboardAvoidingView behavior="padding" style={styles.container}>
+
+            <View style={styles.container}>
+
+                <HeaderList
+                    title="Danh sách người dùng"
+                    backPress={() => router.back()}
+                    addPress={() => router.push({pathname: "/management/users/CreateUser"})}
+                />
+
+                <View style={styles.segmentContainer}>
+                    <SegmentedControl
+                        values={selectValues}
+                        selectedIndex={selectedIndex}
+                        onChange={(event) => {
+                            handleSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+
+                        }}
+                        backgroundColor={COLORS.ITEM_BACKGROUND}
+                        tintColor={COLORS.BLUE_LIGHT}
+                        fontStyle={{ color: COLORS.ITEM_TEXT }}
+                        style={styles.segmentStyle}
+                        activeFontStyle={{ color: COLORS.ITEM_ACTIVE_BLUE }}
+                    />
+                </View>
+
+                <View style={styles.searchContainer}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            setSort(sort === "id,asc" ? "id,desc" : "id,asc");
+                        }}
+                    >
+                        <Ionicons
+                            name="swap-vertical"
+                            size={24}
+                            color={sort === "id,asc" ? COLORS.ITEM_TEXT : "orange"} 
+                        />
+                    </TouchableOpacity>
+
+                    <ShareTextInput
+                        placeholder="Tìm kiếm người dùng"
+                        onChangeText={(text) => {
+                            setFilterName(text);
+                        }}
+                        value={filterName}
+                        inputStyle={styles.inputStyle}
+                        containerStyle={styles.inputContainer}
+                        icon={<Ionicons name="search" size={24} color={COLORS.ITEM_TEXT} />}
+
+                    />
+                    <TouchableOpacity>
+                        <Octicons name="filter" size={24} color={COLORS.ITEM_TEXT} />
+                    </TouchableOpacity>
+                </View>
+
+                <FlatList
+                    data={users}
+                    renderItem={({ item }) => <ItemUser
+                        title={item.name}
+                        description={item.phone}
+                        imageUri={item.avatar ? `${image_url_base}/avatar/${item.avatar}` : ""}
+                        editPress={() => handleViewUser(item)}
+                        deletePress={() => {
+                            setItemDelete(item);
+                            setVisible(true);
+                        }} />}
+                    keyExtractor={item => item.id || ""}
+                    ListEmptyComponent={<EmptyState title="Không có người dùng" description="Vui lòng thêm người dùng mới" />}
+
+                />
+                <ConfirmDialog
+                    visible={visible}
+                    title="Xóa người dùng"
+                    message="Bạn có chắc chắn muốn xóa người dùng này không?"
+                    onConfirm={() => {
+                        if (itemDelete) {
+                            handleConfirmDeleteUser(itemDelete);
+                        }
+                    }}
+                    onCancel={() => setVisible(false)}
+                />
+
+
+            </View>
+
+        </KeyboardAvoidingView>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.BACKGROUND,
+    },
+    segmentContainer: {
+        backgroundColor: COLORS.ITEM_BACKGROUND,
+    },
+    segmentStyle: {
+        height: 36,
+    },
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginVertical: 16,
+        paddingHorizontal: 16,
+        backgroundColor: COLORS.BACKGROUND,
+    },
+    listContainer: {
+        flex: 1,
+        padding: 16,
+    },
+    inputStyle: {
+        backgroundColor: COLORS.ITEM_BACKGROUND,
+        paddingHorizontal: 30,
+        color: COLORS.ITEM_TEXT,
+
+    },
+    inputContainer: {
+        marginVertical: 0,
+        width: "80%",
+    },
+    footerContainer: {
+        padding: 16,
+        alignItems: "center",
+    },
+    footerText: {
+        color: COLORS.ITEM_TEXT,
+    },
+});
+
+export default UsersScreen;

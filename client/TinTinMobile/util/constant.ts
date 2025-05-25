@@ -7,4 +7,6 @@ export const COLORS = {
     CONTENT_ACCORDION: "#3A3B3C",
     ITEM_TEXT: "#B0B3B8",
     ITEM_BORDER: "#3A3B3C",
+    ITEM_ACTIVE_BLUE: "#007AFF",
+    BLUE_LIGHT: "#ADD8E6",
 }

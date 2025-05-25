@@ -179,9 +179,9 @@ const SettingScreen = () => {
                 </Accordion>
             </View>
 
-            <AccessControl role="admin" allow={["admin"]}>
+            <AccessControl role={user?.user.role.name || "user"} allow={["admin"]}>
                 <View style={styles.itemContainer}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => router.push("../../management/users")}>
                         <View style={styles.itemHeader}>
                             <Entypo name="list" size={24} color={COLORS.ITEM_TEXT} />
                             <Text style={styles.headerText}>Danh sách người dùng</Text>

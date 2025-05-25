@@ -11,7 +11,7 @@ import { LoadingProvider, useLoading } from "@/context/LoadingContext";
 import LoadingModal from "@/components/LoadingModal";
 import { useEffect } from "react";
 import { setLoadingHandler } from "@/config/axios-customize"; 
-
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 function WithLoadingHandler() {
   const { showLoading, hideLoading } = useLoading();
 
@@ -32,6 +32,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
+       <ActionSheetProvider>
       <LoadingProvider>
         <AppProvider>
           <StatusBar hidden />
@@ -41,6 +42,7 @@ export default function RootLayout() {
           <Toast config={toastConfig} />
         </AppProvider>
       </LoadingProvider>
+      </ActionSheetProvider>
     </QueryClientProvider>
   );
 }

@@ -44,11 +44,13 @@ public class UserService {
             throw new DuplicateResourceException("User with email " + user.getEmail() + " already exists");
         }
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-        Optional<Role> role = this.roleRepository.findById(user.getRole().getId());
-        if(role.isPresent()){
-            user.setRole(role.get());
-        }else{
-            user.setRole(null);
+        if(user.getRole() != null){
+            Optional<Role> role = this.roleRepository.findById(user.getRole().getId());
+            if(role.isPresent()){
+                user.setRole(role.get());
+            }else{
+                user.setRole(null);
+            }
         }
 
         return UserMapper.toUserCreateDto(this.userRepository.save(user));
@@ -136,11 +138,13 @@ public class UserService {
         currentUser.setGender(user.getGender());
         currentUser.setBirthdate(user.getBirthdate());
         currentUser.setAvatar(user.getAvatar());
-        Optional<Role> role = this.roleRepository.findById(user.getRole().getId());
-        if(role.isPresent()){
-            currentUser.setRole(role.get());
-        }else{
-            currentUser.setRole(null);
+        if(user.getRole() != null){
+            Optional<Role> role = this.roleRepository.findById(user.getRole().getId());
+            if(role.isPresent()){
+                currentUser.setRole(role.get());
+            }else{
+                currentUser.setRole(null);
+            }
         }
 
         this.userRepository.save(currentUser);

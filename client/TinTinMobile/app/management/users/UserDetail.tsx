@@ -10,24 +10,25 @@ import ProfileInput from "@/components/ProfileInput";
 import * as ImagePicker from 'expo-image-picker';
 import { requestImagePickerPermission} from "@/util/ImagePickerPermisison";
 import ShareButton from "@/components/ShareButton";
-import { callUpdateUser, callUploadFile } from "@/config/api";
+import { callGetRoles, callUpdateUser, callUploadFile } from "@/config/api";
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Toast from "react-native-toast-message";
 import { validateEmail } from "@/service/validate";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { IRole } from "@/types/backend";
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };
 const IPV4 = process.env.EXPO_PUBLIC_IPV4;
 const PORT = process.env.EXPO_PUBLIC_PORT;
 const image_url_base = `http://${IPV4}:${PORT}/storage`;
-const ProfileScreen = () => {
+const ROLES = ["Admin", "User", "Guest"];
+const UserDetail = () => {
 
     const { showActionSheetWithOptions } = useActionSheet();
     const { userDataStr } = useLocalSearchParams();
     let userData = userDataStr ? JSON.parse(decodeURIComponent(userDataStr as string)) : null;
-    console.log(userData);
 
     const [name, setName] = useState<string>(userData?.name);
     const [email, setEmail] = useState<string>(userData?.email);
@@ -43,6 +44,7 @@ const ProfileScreen = () => {
     const [nameError, setNameError] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
     const [phoneError, setPhoneError] = useState<string>("");
+    const [role, setRole] = useState<string>(userData?.role?.name||"Guest");
     const handleConfirm = (date: Date) => {
         const formatted = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
             .toString()
@@ -67,7 +69,24 @@ const ProfileScreen = () => {
           }
         );
       };
+      const openRolePicker = () => {
+        const options = ["Admin", "User", "Guest", "Cancel"];
+        const cancelButtonIndex = 3;
     
+        showActionSheetWithOptions(
+          {
+            options,
+            cancelButtonIndex,
+          },
+          (buttonIndex) => {
+            if (buttonIndex === 0) setRole("Admin");
+            else if (buttonIndex === 1) setRole("User");
+            else if (buttonIndex === 2) setRole("Guest");
+          }
+        );
+      };
+    
+
      const pickImageAsync = async () => {
         const permission = await requestImagePickerPermission();
         if (permission) {
@@ -118,10 +137,17 @@ const ProfileScreen = () => {
         userData.phone = phone;
         userData.birthdate = birthDate;
         userData.gender = gender;
+        if(role=="Guest"){
+            userData.role = null;
+        }else{
+            userData.role = ROLES.findIndex((role) => role === role)+1;
+        }
         if(isUploadImage){
             userData.avatar = avatarFileName;
         }
-        const res = await callUpdateUser(userData);   
+        console.log(userData);
+        const res = await callUpdateUser(userData); 
+
         if(res.data){
             Toast.show({
                 text1: "Cập nhật thông tin thành công",
@@ -173,10 +199,12 @@ const ProfileScreen = () => {
         router.back();
     }
 
+    
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+       
+        
 
-            <View style={styles.container}>
+            <View style={[styles.container, {paddingBottom: 100}]}>
                 {/* Header */}
                 <View style={styles.header}>
                     <TouchableOpacity
@@ -190,7 +218,7 @@ const ProfileScreen = () => {
                     <Text style={styles.headerText}>Cập nhật thông tin</Text>
                 </View>
                 <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
-                    <ScrollView>
+                    <ScrollView >
                         {/* Avatar với icon chỉnh sửa */}
                         <View style={styles.avatarWrapper}>
                         <Image
@@ -237,23 +265,38 @@ const ProfileScreen = () => {
                         keyboardType="numeric"
                         
                     />
-                    <ProfileInput
-                        value={birthDate}
-                        onPress={showDatePicker}
-                        iconName="calendar"
-                    />
-
+                    <View >
+                        <Text style={{color: COLORS.ITEM_TEXT, fontSize: 16, fontWeight: "bold"}}>Birthday</Text>
+                        <ProfileInput
+                            value={birthDate}
+                            onPress={showDatePicker}
+                            iconName="calendar"
+                        />
+                    </View>
+                    <View >
+                        <Text style={{color: COLORS.ITEM_TEXT, fontSize: 16, fontWeight: "bold"}}>Role</Text>
+                        <ProfileInput
+                            value={role}
+                            onPress={openRolePicker}
+                            iconName="people"
+                        />
+                    </View>
+                   
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible}
                         mode="date"
                         onConfirm={handleConfirm}
                         onCancel={hideDatePicker}
                     />
-                    <ProfileInput
-                        value={gender}
-                        onPress={openGenderPicker}
-                        iconName="male-female"
-                    />
+                    <View >
+                        <Text style={{color: COLORS.ITEM_TEXT, fontSize: 16, fontWeight: "bold"}}>Gender</Text>
+                        <ProfileInput
+                            value={gender}
+                            onPress={openGenderPicker}
+                            iconName="male-female"
+                            
+                        />
+                    </View>
                     <ShareButton
                         title="Cập nhật"
                         onPress={handleUpdate}
@@ -269,9 +312,11 @@ const ProfileScreen = () => {
                         logo={<Feather name="upload-cloud" size={24} color="black" />}
                     />
                 </ScrollView>
+               
                 </KeyboardAvoidingView>
+                
             </View>
-        </TouchableWithoutFeedback>
+     
 
     );
 };
@@ -359,4 +404,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default ProfileScreen;
+export default UserDetail;

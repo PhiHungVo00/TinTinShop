@@ -1,4 +1,4 @@
-import { IAccount, IBackendRes, IFile, IGetAccount, IUser } from "@/types/backend"
+import { IAccount, IBackendRes, IFile, IGetAccount, IModelPaginate, IRole, IUser } from "@/types/backend"
 import axios from "./axios-customize"
 
 /**
@@ -48,4 +48,43 @@ export const callGetUser = (id: string) => {
 export const callUpdateUser = (user: IUser) => {
     return axios.put<IBackendRes<IUser>>(`/api/v1/users`, user)
 }
+
+export const callGetUsers = ({ page, size, sort, filter }: {
+    page?: number,
+    size?: number,
+    sort?: string,
+    filter?: string
+}) => {
+    const params = new URLSearchParams();
+
+    if (page !== undefined) params.append("page", page.toString());
+    if (size !== undefined) params.append("size", size.toString());
+    if (sort) params.append("sort", sort);
+    if (filter) params.append("filter", filter);
+    return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users?${params.toString()}`);
+};
+
+export const callDeleteUser = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/users/${id}`);
+}
+
+/**
+ * 
+Module Role
+ */
+export const callGetRoles = ({ page, size, sort, filter }: {
+    page?: number,
+    size?: number,
+    sort?: string,
+    filter?: string
+}) => {
+    const params = new URLSearchParams();
+
+    if (page !== undefined) params.append("page", page.toString());
+    if (size !== undefined) params.append("size", size.toString());
+    if (sort) params.append("sort", sort);
+    if (filter) params.append("filter", filter);
+    console.log('>> check url: ',`/api/v1/roles?${params.toString()}`);
+    return axios.get<IBackendRes<IModelPaginate<IRole>>>(`/api/v1/roles?${params.toString()}`);
+};
 
