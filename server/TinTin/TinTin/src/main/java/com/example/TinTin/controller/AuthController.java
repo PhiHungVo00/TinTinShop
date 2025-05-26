@@ -139,7 +139,7 @@ public class AuthController {
 
     @PostMapping("/auth/logout")
     @ApiMessage("Logout account")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<Void> logout() {
         String email = SecurityUtil.getCurrentUserLogin()
                 .orElseThrow(() -> new IdInvalidException("Token truyền lên không hợp lệ"));
 
@@ -155,7 +155,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body("Logout success");
+                .body(null);
 
     }
     @PostMapping("/auth/register")

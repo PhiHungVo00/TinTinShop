@@ -2,6 +2,7 @@ package com.example.TinTin.domain;
 
 import com.example.TinTin.util.SecurityUtil;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,21 +22,29 @@ public class AddressUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "address_id")
-    private Address address;
+    @NotBlank(message = "Tên đường không được để trống")
+    private String addressLine;
+
+    @NotBlank(message = "Tên phường không được để trống")
+    private String ward;
+
+    @NotBlank(message = "Tên quận không được để trống")
+    private String district;
+
+    @NotBlank(message = "Tên tỉnh không được để trống")
+    private String province;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     private String receiverName;
-    private long receiverPhone;
+    private String receiverPhone;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
-    private boolean isDefault;
+    private boolean defaultAddress;
 
     private Instant createdAt;
     private Instant updatedAt;
