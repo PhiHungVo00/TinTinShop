@@ -11,4 +11,7 @@ export const COLORS = {
     BLUE_LIGHT: "#ADD8E6",
     INPUT_DROPDOWN: "#2C314B",
     PRIMARY: "#439ce0",
+    ERROR: "#bf2c24",
+    SUCCESS: "#439946",
+    WARNING: "#cfbe27",
 }

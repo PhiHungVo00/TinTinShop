@@ -31,14 +31,15 @@ const Address = () => {
         }
      }
     useEffect(()=>{
-
-      
-
         fetchAddresses();
-
-        
-
     },[])
+
+    const handleEditAddress = (id: string) => {
+        if(id){
+            router.push({pathname: '/address/AddressDetail', params: {id: id}})
+        }
+
+    }
     return (
         <View style={styles.container}>
             <HeaderList title="Địa chỉ" 
@@ -52,7 +53,9 @@ const Address = () => {
                                     receiverPhone={item.receiverPhone}
                                     description={item.description}
                                     defaultAddress={item.defaultAddress}
-                                    address={`${item.addressLine}, ${item.district}, ${item.ward}, ${item.province}`}/>
+                                    address={`${item.addressLine}, ${item.district}, ${item.ward}, ${item.province}`}
+                                    onPress={() => handleEditAddress(item.id as string)}
+                                    />
     }
         keyExtractor={(item, index) => index.toString()}
         refreshing={refreshing}

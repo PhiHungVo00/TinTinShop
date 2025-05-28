@@ -128,7 +128,6 @@ const CreateAddress = () => {
                         });
                         router.back();
                     } else {
-                        debugger;
                         Toast.show({
                             text1: "Thêm địa chỉ thất bại",
                             type: "error",

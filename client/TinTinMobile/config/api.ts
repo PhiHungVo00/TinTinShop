@@ -103,3 +103,15 @@ export const getAllAddressOfUser = (id: string) => {
 export const createAddress = (address: IAddressUser) => {
     return axios.post<IBackendRes<IAddressUser>>(`/api/v1/addresses-user`, address)
 }
+
+export const getAddressById = (id: string) => {
+    return axios.get<IBackendRes<IAddressUser>>(`/api/v1/addresses-user/${id}`)
+}
+
+export const updateAddress = (address: IAddressUser) => {
+    return axios.put<IBackendRes<IAddressUser>>(`/api/v1/addresses-user`, address)
+}
+
+export const deleteAddress = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/addresses-user/${id}`)
+}

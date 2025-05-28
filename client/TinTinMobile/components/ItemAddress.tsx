@@ -7,9 +7,10 @@ interface ItemAddressProps {
     description?: string;
     defaultAddress: boolean;
     address: string;
+    onPress: () => void;
 
 }
-const ItemAddress = ({ receiverName, receiverPhone, description, defaultAddress, address }: ItemAddressProps) => {
+const ItemAddress = ({ receiverName, receiverPhone, description, defaultAddress, address, onPress }: ItemAddressProps) => {
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -22,7 +23,7 @@ const ItemAddress = ({ receiverName, receiverPhone, description, defaultAddress,
             {description && <View>
                 <Text style={styles.contentText}>{description}</Text>
             </View>}
-            <TouchableOpacity>
+            <TouchableOpacity onPress={onPress}>
                 <View style={styles.addressGroup}>
                     <View style={{ flex: 1, marginRight: 10 }}>
                         <Text
