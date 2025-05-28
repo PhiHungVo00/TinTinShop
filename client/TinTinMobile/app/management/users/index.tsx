@@ -13,6 +13,7 @@ import { IMeta, IUser } from "@/types/backend";
 import EmptyState from "@/components/EmptyState";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Toast from "react-native-toast-message";
+import { useAppContext } from "@/context/AppContext";
 const IPV4 = process.env.EXPO_PUBLIC_IPV4;
 const PORT = process.env.EXPO_PUBLIC_PORT;
 const image_url_base = `http://${IPV4}:${PORT}/storage`;
@@ -29,6 +30,7 @@ const UsersScreen = () => {
     const [visible, setVisible] = useState(false);
     const [itemDelete, setItemDelete] = useState<IUser>();
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const { user } = useAppContext();
 
     const createFilter = (filterName: string, filterRole: string) => {
         let filter = "";
@@ -51,7 +53,7 @@ const UsersScreen = () => {
                 sort,
                 filter,
             });
-        }, 500);
+        }, 1000);
 
         return () => clearTimeout(delayDebounce);
     }, [filterRole, filterName, sort, selectedIndex, page, isRefreshing]);
@@ -172,21 +174,27 @@ const UsersScreen = () => {
 
                 <FlatList
                     data={users}
-                    renderItem={({ item }) => <ItemUser
-                        title={item.name}
-                        description={item.phone}
-                        imageUri={item.avatar ? `${image_url_base}/avatar/${item.avatar}` : ""}
-                        editPress={() => handleViewUser(item)}
-                        deletePress={() => {
-                            setItemDelete(item);
-                            setVisible(true);
-                        }} />}
-                    keyExtractor={item => item.id || ""}
-                    ListEmptyComponent={<EmptyState title="Không có người dùng" description="Vui lòng thêm người dùng mới" />}
+                        renderItem={({ item }) => {
+                            if (item.id === user?.user.id) {
+                                return null;
+                            }
+                            return <ItemUser
+                                title={item.name}
+                                description={item.phone}
+                                imageUri={item.avatar ? `${image_url_base}/avatar/${item.avatar}` : ""}
+                                editPress={() => handleViewUser(item)}
+                                deletePress={() => {
+                                    setItemDelete(item);
+                                    setVisible(true);
+                                }}
+                            />
+                        }}
+                        keyExtractor={item => item.id || ""}
+                        ListEmptyComponent={<EmptyState title="Không có người dùng" description="Vui lòng thêm người dùng mới" />}
 
-                />
-                <ConfirmDialog
-                    visible={visible}
+                    />
+                    <ConfirmDialog
+                        visible={visible}
                     title="Xóa người dùng"
                     message="Bạn có chắc chắn muốn xóa người dùng này không?"
                     onConfirm={() => {

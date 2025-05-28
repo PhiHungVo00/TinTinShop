@@ -1,4 +1,4 @@
-import { IAccount, IBackendRes, IFile, IGetAccount, IModelPaginate, IRole, IUser } from "@/types/backend"
+import { IAccount, IAddressUser, IBackendRes, IFile, IGetAccount, IModelPaginate, IRole, IUser } from "@/types/backend"
 import axios from "./axios-customize"
 
 /**
@@ -22,7 +22,7 @@ export const callRefreshToken = () => {
 }
 
 export const callLogout = () => {
-    return axios.post<IBackendRes<string>|string>('/api/v1/auth/logout')
+    return axios.post<IBackendRes<void>>('/api/v1/auth/logout')
 }
 
 /**
@@ -68,6 +68,10 @@ export const callDeleteUser = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/users/${id}`);
 }
 
+export const createUser = (user: IUser) => {
+    return axios.post<IBackendRes<IUser>>(`/api/v1/users`, user)
+}
+
 /**
  * 
 Module Role
@@ -88,3 +92,14 @@ export const callGetRoles = ({ page, size, sort, filter }: {
     return axios.get<IBackendRes<IModelPaginate<IRole>>>(`/api/v1/roles?${params.toString()}`);
 };
 
+/**
+ * 
+Module Address
+ */
+export const getAllAddressOfUser = (id: string) => {
+    return axios.get<IBackendRes<IAddressUser[]>>(`/api/v1/addresses-user/users/${id}`);
+}
+
+export const createAddress = (address: IAddressUser) => {
+    return axios.post<IBackendRes<IAddressUser>>(`/api/v1/addresses-user`, address)
+}

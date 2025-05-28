@@ -16,7 +16,6 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Toast from "react-native-toast-message";
 import { validateEmail } from "@/service/validate";
 import { useActionSheet } from "@expo/react-native-action-sheet";
-import { IRole } from "@/types/backend";
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };

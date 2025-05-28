@@ -170,13 +170,16 @@ const SignInScreen = () => {
                   title="Email"
                   value={email}
                   onChangeText={handleEmailChange}
-                  error={emailError} />
+                  error={emailError} 
+                  textStyle={{color: COLORS.BLACK}}/>
+                  
                 <ShareTextInput
                   title="Password"
                   isPassword={true}
                   value={password}
                   onChangeText={handlePasswordChange}
-                  error={passwordError} />
+                  error={passwordError} 
+                  textStyle={{color: COLORS.BLACK}}/>
               </View>
 
               {/* Login Button */}

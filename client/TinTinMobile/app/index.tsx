@@ -4,8 +4,8 @@ import { Platform, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { callFetchAccount } from '@/config/api';
 import { useAppContext } from '@/context/AppContext';
+import 'react-native-reanimated';
 
-// Chỉ gọi preventAutoHide nếu KHÔNG PHẢI iOS
 if (Platform.OS !== 'ios') {
   SplashScreen.preventAutoHideAsync();
 }
@@ -32,7 +32,6 @@ const RootPage = () => {
       } catch (e) {
         console.warn(e);
       } finally {
-        // Chỉ hide splash nếu KHÔNG PHẢI iOS
         if (Platform.OS !== 'ios') {
           await SplashScreen.hideAsync();
         }

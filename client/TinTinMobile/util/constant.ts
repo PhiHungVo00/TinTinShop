@@ -9,4 +9,6 @@ export const COLORS = {
     ITEM_BORDER: "#3A3B3C",
     ITEM_ACTIVE_BLUE: "#007AFF",
     BLUE_LIGHT: "#ADD8E6",
+    INPUT_DROPDOWN: "#2C314B",
+    PRIMARY: "#439ce0",
 }

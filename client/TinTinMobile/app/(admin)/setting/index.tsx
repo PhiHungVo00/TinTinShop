@@ -60,10 +60,9 @@ const SettingScreen = () => {
         setShowLogoutDialog(false);
         const res = await callLogout();
         AsyncStorage.removeItem("access_token");
-        AsyncStorage.removeItem("refresh_token");
         setUser(null);
         
-        if (res === "Logout success") {
+        if (res.statusCode === 200) {
             Toast.show({ text1: "Đăng xuất thành công", type: "success" });
             router.replace("/(auth)/WelcomeScreen");
         } else {
@@ -90,7 +89,7 @@ const SettingScreen = () => {
     }
 
     const handleAddress = () => {
-        Alert.alert("Chức năng đang phát triển");
+        router.push("../../address");
     }
 
     const handleStore = () => {

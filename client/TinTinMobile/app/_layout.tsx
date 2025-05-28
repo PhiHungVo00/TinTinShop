@@ -5,8 +5,8 @@ import Toast from "react-native-toast-message";
 import CustomToast from "@/components/CustomToast";
 import { AppProvider } from "@/context/AppContext";
 import { COLORS } from "@/util/constant";
-
-
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 import { LoadingProvider, useLoading } from "@/context/LoadingContext";
 import LoadingModal from "@/components/LoadingModal";
 import { useEffect } from "react";

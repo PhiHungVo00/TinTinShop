@@ -27,7 +27,6 @@ const ProfileScreen = () => {
     const { showActionSheetWithOptions } = useActionSheet();
     const { userDataStr } = useLocalSearchParams();
     let userData = userDataStr ? JSON.parse(decodeURIComponent(userDataStr as string)) : null;
-    console.log(userData);
 
     const [name, setName] = useState<string>(userData?.name);
     const [email, setEmail] = useState<string>(userData?.email);

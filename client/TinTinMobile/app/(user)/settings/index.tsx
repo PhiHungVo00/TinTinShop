@@ -27,7 +27,6 @@ const image_url_base = `http://${IPV4}:${PORT}/storage`;
 
 const SettingScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
-
     const onRefresh = useCallback(() => {
         const fetchUser = async (id: string) => {
             try {
@@ -37,7 +36,6 @@ const SettingScreen = () => {
                 const res = await callGetUser(id);
                 if (res.data) {
                     setUserData(res.data);
-                    console.log(res.data);
                 }
             } catch (error) {
                 console.error("Lỗi khi fetch user:", error);
@@ -60,12 +58,12 @@ const SettingScreen = () => {
         setShowLogoutDialog(false);
         const res = await callLogout();
         AsyncStorage.removeItem("access_token");
-        AsyncStorage.removeItem("refresh_token");
         setUser(null);
         
-        if (res === "Logout success") {
+        if (res.statusCode === 200) {
+            router.replace("../../(auth)/WelcomeScreen");
             Toast.show({ text1: "Đăng xuất thành công", type: "success" });
-            router.replace("/(auth)/WelcomeScreen");
+           
         } else {
             Toast.show({ text1: "Đăng xuất thất bại", type: "error" });
         }

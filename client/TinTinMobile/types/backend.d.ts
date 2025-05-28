@@ -89,3 +89,22 @@ export interface IRole {
     updatedBy: string;
   }[];
 }
+
+export interface IAddressUser {
+  id?: string;
+  addressLine: string;
+  ward: string;
+  district: string;
+  province: string;
+  receiverName: string;
+  receiverPhone: string;
+  description: string;
+  defaultAddress: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  user: {
+    id: string
+  };
+}
