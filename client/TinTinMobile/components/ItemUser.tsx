@@ -3,16 +3,17 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { COLORS } from "@/util/constant";
 interface ItemUserProps {
-    title: string
-    description: string
-    imageUri?: string
-    editPress: () => void
-    deletePress: () => void
+    title: string,
+    description: string,
+    imageUri?: string,
+    editPress: () => void,
+    deletePress?: () => void,
+    showDelete?: boolean,
 }
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };
-const ItemUser = ({ title, description, imageUri, editPress, deletePress }: ItemUserProps) => {
+const ItemUser = ({ title, description, imageUri, editPress, deletePress, showDelete = true }: ItemUserProps) => {
     return (
         <View style={styles.container}>
             <View>
@@ -29,9 +30,11 @@ const ItemUser = ({ title, description, imageUri, editPress, deletePress }: Item
                 <TouchableOpacity onPress={editPress}>
                     <AntDesign name="edit" size={24} color={COLORS.ITEM_TEXT} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={deletePress}>
-                    <AntDesign name="delete" size={24} color={COLORS.ITEM_TEXT} />
-                </TouchableOpacity>
+                {showDelete && (
+                    <TouchableOpacity onPress={deletePress}>
+                        <AntDesign name="delete" size={24} color={COLORS.ITEM_TEXT} />
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     )

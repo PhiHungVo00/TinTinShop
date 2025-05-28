@@ -175,9 +175,7 @@ const UsersScreen = () => {
                 <FlatList
                     data={users}
                         renderItem={({ item }) => {
-                            if (item.id === user?.user.id) {
-                                return null;
-                            }
+                           
                             return <ItemUser
                                 title={item.name}
                                 description={item.phone}
@@ -187,6 +185,7 @@ const UsersScreen = () => {
                                     setItemDelete(item);
                                     setVisible(true);
                                 }}
+                                showDelete={item.id !== user?.user?.id}
                             />
                         }}
                         keyExtractor={item => item.id || ""}
