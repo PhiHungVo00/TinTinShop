@@ -88,7 +88,7 @@ const SettingScreen = () => {
     }
 
     const handleAddress = () => {
-        Alert.alert("Chức năng đang phát triển");
+        router.push("/address")
     }
 
     const handleStore = () => {
