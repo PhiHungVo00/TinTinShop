@@ -80,7 +80,7 @@ const SettingScreen = () => {
         const jsonStr = encodeURIComponent(JSON.stringify(userData));
 
         router.push({
-            pathname: "../../profile",
+            pathname: "/profile",
             params: {
                 userDataStr: jsonStr,
             },
@@ -89,11 +89,11 @@ const SettingScreen = () => {
     }
 
     const handleAddress = () => {
-        router.push("../../address");
+        router.push("/address");
     }
 
     const handleStore = () => {
-        Alert.alert("Chức năng đang phát triển");
+        router.push("/address/MapScreen");
     }
 
     useEffect(() => {

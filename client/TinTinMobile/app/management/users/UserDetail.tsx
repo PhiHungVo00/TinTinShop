@@ -230,7 +230,7 @@ const UserDetail = () => {
                         {/* Avatar với icon chỉnh sửa */}
                         <View style={styles.avatarWrapper}>
                         <Image
-                            source={avatarFileName ? { uri: `${image_url_base}/avatar/${avatarFileName}` } : image.avatar_default}
+                            source={avatarFileName ? { uri: avatarUri } : image.avatar_default}
                             style={styles.avatar}
                         />
                         <Pressable
