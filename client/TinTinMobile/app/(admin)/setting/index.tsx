@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from 'expo-haptics';
+import SupportItem from "@/components/SupportItem";
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };
@@ -31,9 +32,9 @@ const SettingScreen = () => {
     const onRefresh = useCallback(() => {
         const fetchUser = async (id: string) => {
             try {
-                setRefreshing(true); 
+                setRefreshing(true);
                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
                 const res = await callGetUser(id);
                 if (res.data) {
                     setUserData(res.data);
@@ -46,12 +47,12 @@ const SettingScreen = () => {
                 setRefreshing(false);
             }
         };
-    
+
         if (user?.user.id) {
             fetchUser(user.user.id);
         }
     }, []);
-    
+
     const { user, setUser } = useAppContext();
     const [userData, setUserData] = useState<IUser>();
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -61,7 +62,7 @@ const SettingScreen = () => {
         const res = await callLogout();
         AsyncStorage.removeItem("access_token");
         setUser(null);
-        
+
         if (res.statusCode === 200) {
             Toast.show({ text1: "Đăng xuất thành công", type: "success" });
             router.replace("/(auth)/WelcomeScreen");
@@ -109,8 +110,8 @@ const SettingScreen = () => {
     }, []);
 
     return (
-        <ScrollView 
-            style={styles.container} 
+        <ScrollView
+            style={styles.container}
             contentContainerStyle={styles.contentContainer}
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -128,23 +129,23 @@ const SettingScreen = () => {
                     </View>
                 </View>
                 <View style={styles.flashGroup}>
-                    <IconCard 
-                      icon={<AntDesign name="form" size={24} color={COLORS.ITEM_TEXT} />} 
-                      title="Thông tin" 
-                        onPress={handleProfile} 
-                      textStyle={{ color: COLORS.ITEM_TEXT }} 
+                    <IconCard
+                        icon={<AntDesign name="form" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Thông tin"
+                        onPress={handleProfile}
+                        textStyle={{ color: COLORS.ITEM_TEXT }}
                     />
-                    <IconCard 
-                      icon={<Feather name="map-pin" size={24} color={COLORS.ITEM_TEXT} />} 
-                      title="Địa chỉ" 
-                      onPress={handleAddress} 
-                      textStyle={{ color: COLORS.ITEM_TEXT }} 
+                    <IconCard
+                        icon={<Feather name="map-pin" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Địa chỉ"
+                        onPress={handleAddress}
+                        textStyle={{ color: COLORS.ITEM_TEXT }}
                     />
-                    <IconCard 
-                        icon={<MaterialIcons name="store" size={24} color={COLORS.ITEM_TEXT} />} 
-                        title="Cửa hàng" 
-                        onPress={handleStore} 
-                        textStyle={{ color: COLORS.ITEM_TEXT }} 
+                    <IconCard
+                        icon={<MaterialIcons name="store" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Cửa hàng"
+                        onPress={handleStore}
+                        textStyle={{ color: COLORS.ITEM_TEXT }}
                     />
                 </View>
             </View>
@@ -167,9 +168,36 @@ const SettingScreen = () => {
                     <Text style={styles.headerText}>Trung tâm hỗ trợ</Text>
                 </View>
                 <Accordion title="Hỗ trợ">
-                    <Text>Test 1</Text>
-                    <Text>Test 2</Text>
-                    <Text>Test 3</Text>
+                    <SupportItem
+                        icon={<AntDesign name="phone" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Hotline"
+                        description="1900123456"
+                        url="tel:1900123456" />
+                    <SupportItem
+                        icon={<AntDesign name="mail" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Email"
+                        description="support@TinTinShop.com"
+                        url="mailto:support@TinTinShop.com"
+                    />
+                    <SupportItem
+                        icon={<AntDesign name="link" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Website"
+                        description="https://TinTinShop.vn"
+                        url="https://TinTinShop.vn"
+                    />
+                    <SupportItem
+                        icon={<AntDesign name="facebook-square" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Facebook"
+                        description="facebook.com/TinTinShop"
+                        url="https://facebook.com/TinTinShop"
+                    />
+                    <SupportItem
+                        icon={<AntDesign name="instagram" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Instagram"
+                        description="@TinTinShop_official"
+                        url="https://instagram.com/TinTinShop_official"
+                    />
+
                 </Accordion>
                 <Accordion title="Phản hồi">
                     <Text>Test 1</Text>
@@ -211,7 +239,7 @@ const SettingScreen = () => {
                         <Text style={styles.headerText}>Thoát ứng dụng</Text>
                     </View>
                 </TouchableOpacity>
-                
+
             )}
         </ScrollView>
     );

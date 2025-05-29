@@ -48,7 +48,7 @@ const Accordion = ({
         />
       </TouchableOpacity>
 
-      {isOpen && <View style={styles.content}>{children}</View>}
+      {isOpen && <View >{children}</View>}
     </View>
   );
 };
@@ -77,11 +77,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.ITEM_TEXT,
   },
-  content: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: COLORS.CONTENT_ACCORDION,
-  },
+
 });
 
 export default Accordion;

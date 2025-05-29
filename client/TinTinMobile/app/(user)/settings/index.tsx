@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from 'expo-haptics';
+import SupportItem from "@/components/SupportItem";
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };
@@ -88,11 +89,11 @@ const SettingScreen = () => {
     }
 
     const handleAddress = () => {
-        router.push("/address")
+        router.push("/address");
     }
 
     const handleStore = () => {
-        Alert.alert("Chức năng đang phát triển");
+        router.push("/address/MapScreen");
     }
 
     useEffect(() => {
@@ -166,9 +167,35 @@ const SettingScreen = () => {
                     <Text style={styles.headerText}>Trung tâm hỗ trợ</Text>
                 </View>
                 <Accordion title="Hỗ trợ">
-                    <Text>Test 1</Text>
-                    <Text>Test 2</Text>
-                    <Text>Test 3</Text>
+                <SupportItem
+                        icon={<AntDesign name="phone" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Hotline"
+                        description="1900123456"
+                        url="tel:1900123456" />
+                    <SupportItem
+                        icon={<AntDesign name="mail" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Email"
+                        description="support@TinTinShop.com"
+                        url="mailto:support@TinTinShop.com"
+                    />
+                    <SupportItem
+                        icon={<AntDesign name="link" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Website"
+                        description="https://TinTinShop.vn"
+                        url="https://TinTinShop.vn"
+                    />
+                    <SupportItem
+                        icon={<AntDesign name="facebook-square" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Facebook"
+                        description="facebook.com/TinTinShop"
+                        url="https://facebook.com/TinTinShop"
+                    />
+                    <SupportItem
+                        icon={<AntDesign name="instagram" size={24} color={COLORS.ITEM_TEXT} />}
+                        title="Instagram"
+                        description="@TinTinShop_official"
+                        url="https://instagram.com/TinTinShop_official"
+                    />
                 </Accordion>
                 <Accordion title="Phản hồi">
                     <Text>Test 1</Text>
