@@ -25,6 +25,7 @@ public class GlobalException {
             DuplicateResourceException.class,
             NotFoundException.class,
             IdInvalidException.class,
+            IllegalStateException.class,
     })
     public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();

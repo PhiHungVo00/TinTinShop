@@ -27,6 +27,7 @@ public class Category {
     @NotBlank(message = "Tên loại không được để trống")
     private String name;
 
+
     private Boolean active;
 
     @Column(columnDefinition = "MEDIUMTEXT")

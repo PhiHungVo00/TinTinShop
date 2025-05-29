@@ -27,6 +27,7 @@ public class Product {
     @NotBlank(message = "Tên sản phẩm không được để trống")
     private String name;
 
+    private Boolean active;
     private String image;
 
     @Column(columnDefinition = "MEDIUMTEXT")

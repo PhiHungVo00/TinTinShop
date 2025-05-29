@@ -98,7 +98,8 @@ public class AddressUserService {
 
     public void deleteAddressUser(Long id){
         AddressUser addressUser = this.addressUserRepository.findById(id)
-                .orElseThrow(() -> new IdInvalidException("Address id is invalid"));
+                .orElseThrow(() -> new IdInvalidException("Address not found with id: " + id ));
+        System.out.println(addressUser);
         this.addressUserRepository.delete(addressUser);
     }
 

@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface AddressUserRepository extends JpaRepository<AddressUser, Long>, JpaSpecificationExecutor<AddressUser> {
 
-    
+
 
     List<AddressUser> findAllByUser(User user);
 }
