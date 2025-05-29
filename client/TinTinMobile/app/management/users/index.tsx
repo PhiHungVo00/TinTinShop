@@ -190,7 +190,10 @@ const UsersScreen = () => {
                         }}
                         keyExtractor={item => item.id || ""}
                         ListEmptyComponent={<EmptyState title="Không có người dùng" description="Vui lòng thêm người dùng mới" />}
-
+                        refreshing={isRefreshing}
+                        onRefresh={() => {
+                            setIsRefreshing(true);
+                        }}
                     />
                     <ConfirmDialog
                         visible={visible}

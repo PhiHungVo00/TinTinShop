@@ -49,14 +49,14 @@ export interface IUser {
   email: string;
   password?: string;
   phone: string;
-  age: number;
-  gender: string;
-  birthday: string;
-  avatar: string;
+  age?: number;
+  gender?: string;
+  birthdate?: string;
+  avatar?: string;
   role?: {
     id: string;
     name: string;
-  };
+  } | null;
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;

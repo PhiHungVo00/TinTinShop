@@ -16,6 +16,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Toast from "react-native-toast-message";
 import { validateEmail } from "@/service/validate";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { IUser } from "@/types/backend";
+import { useAppContext } from "@/context/AppContext";
 const image = {
     avatar_default: require("@/assets/images/setting/avatar_default.jpg"),
 };
@@ -27,15 +29,16 @@ const UserDetail = () => {
 
     const { showActionSheetWithOptions } = useActionSheet();
     const { userDataStr } = useLocalSearchParams();
-    let userData = userDataStr ? JSON.parse(decodeURIComponent(userDataStr as string)) : null;
+    const { user } = useAppContext();
+    let userData: IUser = userDataStr ? JSON.parse(decodeURIComponent(userDataStr as string)) : null;
 
     const [name, setName] = useState<string>(userData?.name);
     const [email, setEmail] = useState<string>(userData?.email);
-    const [birthDate, setBirthDate] = useState<string>(userData?.birthdate);
-    const [gender, setGender] = useState<string>(userData?.gender);
+    const [birthDate, setBirthDate] = useState<string>(userData?.birthdate || "");
+    const [gender, setGender] = useState<string>(userData?.gender || "");
     const [phone, setPhone] = useState<string>(userData?.phone);
     const [avatarUri, setAvatarUri] = useState<string>(`${image_url_base}/avatar/${userData?.avatar}`);
-    const [avatarFileName, setAvatarFileName] = useState<string>(userData?.avatar);
+    const [avatarFileName, setAvatarFileName] = useState<string>(userData?.avatar || "");
     const [isDatePickerVisible, setDatePickerVisible] = useState<boolean>(false);
     const showDatePicker = () => setDatePickerVisible(true);
     const hideDatePicker = () => setDatePickerVisible(false);
@@ -43,7 +46,7 @@ const UserDetail = () => {
     const [nameError, setNameError] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
     const [phoneError, setPhoneError] = useState<string>("");
-    const [role, setRole] = useState<string>(userData?.role?.name||"Guest");
+    const [role, setRole] = useState<string>(userData?.role?.id||"3");
     const handleConfirm = (date: Date) => {
         const formatted = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
             .toString()
@@ -78,9 +81,9 @@ const UserDetail = () => {
             cancelButtonIndex,
           },
           (buttonIndex) => {
-            if (buttonIndex === 0) setRole("Admin");
-            else if (buttonIndex === 1) setRole("User");
-            else if (buttonIndex === 2) setRole("Guest");
+            if (buttonIndex === 0) setRole("1");
+            else if (buttonIndex === 1) setRole("2");
+            else if (buttonIndex === 2) setRole("3");
           }
         );
       };
@@ -106,6 +109,7 @@ const UserDetail = () => {
     };
 
     const handleUpdate = async() => {
+        
         setNameError("");
         setEmailError("");
         setPhoneError("");
@@ -131,21 +135,26 @@ const UserDetail = () => {
         if(hasError){
             return;
         }
-        userData.name = name;
-        userData.email = email;
-        userData.phone = phone;
-        userData.birthdate = birthDate;
-        userData.gender = gender;
+        const updateUser: IUser = {
+            id: userData?.id,
+            name: name,
+            email: email,
+            phone: phone,
+            birthdate: birthDate,
+            gender: gender,
+        }
         if(role=="Guest"){
-            userData.role = null;
+            updateUser.role = null;
         }else{
-            userData.role = ROLES.findIndex((role) => role === role)+1;
+            updateUser.role = {
+                id: role,
+                name: ROLES[parseInt(role)-1].toLowerCase(),
+            };
         }
         if(isUploadImage){
-            userData.avatar = avatarFileName;
+            updateUser.avatar = avatarFileName;
         }
-        console.log(userData);
-        const res = await callUpdateUser(userData); 
+        const res = await callUpdateUser(updateUser); 
 
         if(res.data){
             Toast.show({
@@ -221,7 +230,7 @@ const UserDetail = () => {
                         {/* Avatar với icon chỉnh sửa */}
                         <View style={styles.avatarWrapper}>
                         <Image
-                            source={avatarUri ? { uri: avatarUri } : image.avatar_default}
+                            source={avatarFileName ? { uri: `${image_url_base}/avatar/${avatarFileName}` } : image.avatar_default}
                             style={styles.avatar}
                         />
                         <Pressable
@@ -272,14 +281,17 @@ const UserDetail = () => {
                             iconName="calendar"
                         />
                     </View>
-                    <View >
-                        <Text style={{color: COLORS.ITEM_TEXT, fontSize: 16, fontWeight: "bold"}}>Role</Text>
-                        <ProfileInput
-                            value={role}
-                            onPress={openRolePicker}
-                            iconName="people"
-                        />
-                    </View>
+                    {user?.user.id!==userData?.id?
+                     <View >
+                     <Text style={{color: COLORS.ITEM_TEXT, fontSize: 16, fontWeight: "bold"}}>Role</Text>
+                     <ProfileInput
+                         value={ROLES[parseInt(role)-1]}
+                         onPress={openRolePicker}
+                         iconName="people"
+                     />
+                 </View>:<View></View>
+                    }
+                   
                    
                     <DateTimePickerModal
                         isVisible={isDatePickerVisible}
