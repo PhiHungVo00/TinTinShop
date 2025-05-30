@@ -4,6 +4,7 @@ import com.example.TinTin.domain.response.RestResponse;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,8 @@ public class GlobalException {
             NotFoundException.class,
             IdInvalidException.class,
             IllegalStateException.class,
+            IllegalArgumentException.class,
+            HttpMessageNotReadableException.class
     })
     public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
@@ -46,7 +49,8 @@ public class GlobalException {
 //        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
 //    }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class
+          )
     public ResponseEntity<RestResponse<Object>> validationError(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         final List<FieldError> fieldErrors = bindingResult.getFieldErrors();

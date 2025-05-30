@@ -6,6 +6,7 @@ import com.example.TinTin.util.annotation.ApiMessage;
 import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class CategoryController {
     @PostMapping("/categories")
     @ApiMessage("Create new category")
     public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category){
-        return ResponseEntity.ok().body(this.categoryService.createCategory(category));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.categoryService.createCategory(category));
 
     }
 

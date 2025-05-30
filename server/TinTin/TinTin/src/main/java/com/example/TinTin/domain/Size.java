@@ -5,6 +5,7 @@ import com.example.TinTin.util.constrant.SizeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,8 +26,9 @@ public class Size {
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
+
     @Enumerated(EnumType.STRING)
-    @NotBlank(message = "Tên size không được để trống")
+    @NotNull(message = "Tên kích thước không được để trống")
     private SizeEnum name;
 
     @Column(columnDefinition = "MEDIUMTEXT")
