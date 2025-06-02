@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductSizeRequestDTO {
-    @NotNull(message = "Product ID cannot be null")
+    @NotNull(message = "Size ID cannot be null")
     private Long sizeId;
 
     private Long price;
