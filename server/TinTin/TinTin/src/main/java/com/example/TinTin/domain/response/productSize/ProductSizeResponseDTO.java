@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Getter
@@ -18,7 +19,7 @@ public class ProductSizeResponseDTO {
     private Long productId;
     private Long sizeId;
     private SizeEnum sizeName;
-    private Long price;
+    private BigDecimal price;
     private Integer stockQuantity;
     private ProductSizeStatusEnum status;
     private Instant createdAt;

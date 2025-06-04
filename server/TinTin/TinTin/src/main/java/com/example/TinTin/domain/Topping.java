@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class Topping {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
-    @Column(nullable = false)
-    private Long price;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     private ToppingStatusEnum status;

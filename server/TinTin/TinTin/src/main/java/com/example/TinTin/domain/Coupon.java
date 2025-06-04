@@ -52,10 +52,10 @@ public class Coupon {
 
     private int quantity;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private Instant startDate;
+    private Instant endDate;
 
-    private boolean isActive;
+    private Boolean isActive;
 
     private Instant createdAt;
     private Instant updatedAt;

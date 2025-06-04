@@ -54,7 +54,7 @@ public class ProductSizeService {
         if (productSizeRepository.existsByProductAndSize(product, size)) {
             throw new IdInvalidException("Product size variant already exists for product id: " + productId + " and size id: " + size.getId());
         }
-        if (productSizeRequestDTO.getPrice() < 0) {
+        if (productSizeRequestDTO.getPrice().compareTo(BigDecimal.ZERO) < 0) {
             throw new BusinessException("The product price must not be negative.");
         }
         if (productSizeRequestDTO.getStockQuantity() < 0) {
@@ -76,7 +76,7 @@ public class ProductSizeService {
     public ProductSizeResponseDTO updateProductSizeVariant(Long id, ProductSizeRequestDTO productSizeRequestDTO) {
         ProductSize existingVariant = productSizeRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Product size variant not found with id: " + id));
-        if (productSizeRequestDTO.getPrice() < 0) {
+        if (productSizeRequestDTO.getPrice().compareTo(BigDecimal.ZERO) < 0) {
             throw new BusinessException("The product price must not be negative.");
         }
 

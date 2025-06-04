@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class ProductSize {
     @JoinColumn(name = "size_id", nullable = false)
     private Size size;
 
-    @Column(nullable = false)
-    private long price;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
 
     @Column(nullable = false, name = "stock_quantity")
     private int stockQuantity;

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -35,8 +36,8 @@ public class OrderDetail {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(nullable = false, name = "total_price")
-    private Long totalPrice;
+    @Column(name = "total_price", precision = 10, scale = 2)
+    private BigDecimal totalPrice;
 
     private Instant createdAt;
     private Instant updatedAt;
