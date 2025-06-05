@@ -1,4 +1,4 @@
-import { IAccount, IAddressUser, IBackendRes, IFile, IGetAccount, IModelPaginate, IRole, IUser } from "@/types/backend"
+import { IAccount, IAddressUser, IBackendRes, ICoupon, IFile, IGetAccount, IModelPaginate, IRole, IUser } from "@/types/backend"
 import axios from "./axios-customize"
 
 /**
@@ -88,7 +88,6 @@ export const callGetRoles = ({ page, size, sort, filter }: {
     if (size !== undefined) params.append("size", size.toString());
     if (sort) params.append("sort", sort);
     if (filter) params.append("filter", filter);
-    console.log('>> check url: ',`/api/v1/roles?${params.toString()}`);
     return axios.get<IBackendRes<IModelPaginate<IRole>>>(`/api/v1/roles?${params.toString()}`);
 };
 
@@ -115,3 +114,38 @@ export const updateAddress = (address: IAddressUser) => {
 export const deleteAddress = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/addresses-user/${id}`)
 }
+
+/**
+ * 
+Module Coupon
+ */
+export const callGetCoupons = ({ page, size, sort, filter }: {
+    page?: number,
+    size?: number,
+    sort?: string,
+    filter?: string
+}) => {
+    const params = new URLSearchParams();
+
+    if (page !== undefined) params.append("page", page.toString());
+    if (size !== undefined) params.append("size", size.toString());
+    if (sort) params.append("sort", sort);
+    if (filter) params.append("filter", filter);
+    return axios.get<IBackendRes<ICoupon[]>>(`/api/v1/coupons?${params.toString()}`);
+};
+export const callCreateCoupon = (coupon: ICoupon) => {
+    return axios.post<IBackendRes<ICoupon>>(`/api/v1/coupons`, coupon)
+}
+
+export const callUpdateCoupon = (coupon: ICoupon) => {
+    return axios.put<IBackendRes<ICoupon>>(`/api/v1/coupons`, coupon)
+}
+
+export const callDeleteCoupon = (id: number) => {
+    return axios.delete<IBackendRes<ICoupon>>(`/api/v1/coupons/${id}`)
+}
+
+export const callGetCouponById = (id: number) => {
+    return axios.get<IBackendRes<ICoupon>>(`/api/v1/coupons/${id}`)
+}
+
