@@ -108,3 +108,24 @@ export interface IAddressUser {
     id: string
   };
 }
+
+export interface ICoupon {
+  id?: number;
+  code: string;
+  description: string;
+  image: string;
+  discountType: DiscountType;
+  discountValue: number;
+  maxDiscount: number;
+  minOrderValue: number;
+  quantity: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  
+
+}

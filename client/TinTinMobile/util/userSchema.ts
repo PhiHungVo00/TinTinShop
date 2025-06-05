@@ -1,40 +1,48 @@
 import * as Yup from 'yup';
 
-const badWords = [ 'địt',
-    'cặc',
-    'lồn',
-    'buồi',
-    'dm',
-    'đm',
-    'vcl',
-    'vãi lồn',
-    'vkl',
-    'vklồn',
-    'chó',
-    'đĩ',
-    'dâm',
-    'đú',
-    'xồn',
-    'đụ',
-    'fuck',
-    'shit',
-    'bitch',
-    'ass',
-    'địt mẹ',
-    'đồ chó',
-    'mẹ mày',
-    'bố mày',
-    'thằng ngu',
-    'con đĩ',
-    'thằng chó',
-    'con chó',
-    'cút',];
+const badWordsEncoded = [
+  'xJBpZHQ=',
+  'w6tjw6tj',
+  'bMO0bg==',
+  'YnXhu7Np',
+  'ZG0=',
+  'xJDhu4Y=',
+  'dmNs',
+  'dmFzIGzDtG4=',
+  'dmts',
+  'dmtsw7Ru',
+  'Y2jDoy==',
+  'xJDEkQ==',
+  'ZMOibQ==',
+  'xJDhu7U=',
+  'eMO0bg==',
+  'xJB1',
+  'ZnVjaw==',
+  'c2hpdA==',
+  'Yml0Y2g=',
+  'YXNz',
+  'xJBpZHThuqBt4bqj',
+  'xJBvw6MgY2jDoy==',
+  'bOG6o2UgbWF5',
+  'YsOzbSBt4bqteQ==',
+  'dGjDoG5nIG5ndQ==',
+  'Y29uIMSRxIs=',
+  'dGjDoG5nIGNow7M=',
+  'Y29uIGNow7M=',
+  'Y8awdA==',
+];
+
+const decodeBase64 = (encoded: string) =>
+  atob(encoded);
+
+
+const badWords = badWordsEncoded.map(decodeBase64);
+
 
 const isProfanityFree = (value: string) => {
   const lower = value.toLowerCase();
   return !badWords.some((word) => lower.includes(word));
 };
-
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
 // Ý nghĩa:
 // - Tối thiểu 8 ký tự

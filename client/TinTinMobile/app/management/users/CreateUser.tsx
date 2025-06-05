@@ -170,7 +170,7 @@ const CreateUser = () => {
                         handleCreateUser(values);
                     }}
                     >
-                        {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+                        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                              <View>
                                  <ShareTextInput
                               title="Name"

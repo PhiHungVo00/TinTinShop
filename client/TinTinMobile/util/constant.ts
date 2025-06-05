@@ -14,4 +14,13 @@ export const COLORS = {
     ERROR: "#bf2c24",
     SUCCESS: "#439946",
     WARNING: "#cfbe27",
+    DISABLED_TEXT: '#6b7280',        // Gray-500 - màu text khi disable
+    DISABLED_BACKGROUND: '#374151',   // Gray-700 - màu background khi disable
+    DISABLED_BORDER: '#4b5563',      // Gray-600 - màu border khi disable
+    
+    // Hoặc có thể sử dụng opacity để tạo hiệu ứng disable
+    DISABLED_TEXT_OPACITY: 'rgba(255, 255, 255, 0.4)',      // 40% opacity của text màu trắng
+    DISABLED_BACKGROUND_OPACITY: 'rgba(255, 255, 255, 0.05)', // 5% opacity của background
+    DISABLED_BORDER_OPACITY: 'rgba(255, 255, 255, 0.1)',
 }
+

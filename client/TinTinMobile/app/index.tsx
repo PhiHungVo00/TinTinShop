@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { callFetchAccount } from '@/config/api';
 import { useAppContext } from '@/context/AppContext';
 import 'react-native-reanimated';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 if (Platform.OS !== 'ios') {
   SplashScreen.preventAutoHideAsync();
 }
@@ -27,6 +27,7 @@ const RootPage = () => {
             router.replace('/(user)/home');
           }
         } else {
+          await AsyncStorage.clear();
           router.replace('/(auth)/WelcomeScreen');
         }
       } catch (e) {
