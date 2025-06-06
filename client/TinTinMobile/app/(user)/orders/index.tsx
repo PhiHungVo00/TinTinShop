@@ -2,6 +2,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { router } from 'expo-router';
 
 const orders = [
   {
@@ -17,7 +18,7 @@ const orders = [
   {
     id: '2',
     date: '19/03/2024',
-    status: 'Đang xử lý',
+    status: 'Chưa thanh toán',
     items: [
       { name: 'Trà đào', quantity: 1, price: '35.000đ' },
     ],
@@ -26,7 +27,14 @@ const orders = [
 ];
 
 export default function OrdersScreen() {
-  return (
+    // Function to handle payment button press
+    const handlePaymentPress = (orderId: string) => {
+        // In a real app, you would pass the orderId to the payment screen
+        console.log(`Payment button pressed for order: ${orderId}`);
+        router.push('/(user)/payment'); // Navigate to payment screen
+    };
+
+    return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Đơn hàng của tôi</Text>
@@ -46,7 +54,7 @@ export default function OrdersScreen() {
                   </Text>
                 </View>
                 <View style={styles.orderDate}>
-                  <AntDesign name="calendar" size={16} color="gray" />
+                  <AntDesign name="calendar" size={16} color={COLORS.ITEM_TEXT} />
                   <Text style={styles.dateText}>{order.date}</Text>
                 </View>
                 <View style={styles.orderItems}>
@@ -61,6 +69,14 @@ export default function OrdersScreen() {
                   <Text style={styles.totalLabel}>Tổng cộng:</Text>
                   <Text style={styles.totalAmount}>{order.total}</Text>
                 </View>
+               {order.status === 'Chưa thanh toán' && (
+                 <TouchableOpacity 
+                    style={styles.paymentButton}
+                    onPress={() => handlePaymentPress(order.id)}
+                 >
+                   <Text style={styles.paymentButtonText}>Thanh toán</Text>
+                 </TouchableOpacity>
+               )}
               </TouchableOpacity>
             ))}
           </View>
@@ -82,12 +98,11 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    backgroundColor: COLORS.PRIMARY,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: COLORS.TEXT,
   },
   scrollView: {
     flex: 1,
@@ -96,7 +111,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   orderCard: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.ITEM_BACKGROUND,
     borderRadius: 8,
     marginBottom: 16,
     padding: 16,
@@ -115,6 +130,7 @@ const styles = StyleSheet.create({
   orderId: {
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.TEXT,
   },
   orderStatus: {
     fontSize: 14,
@@ -127,11 +143,11 @@ const styles = StyleSheet.create({
   },
   dateText: {
     marginLeft: 4,
-    color: 'gray',
+    color: COLORS.ITEM_TEXT,
   },
   orderItems: {
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'white',
     paddingTop: 12,
   },
   orderItem: {
@@ -141,10 +157,11 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 14,
+    color: COLORS.TEXT,
   },
   itemPrice: {
     fontSize: 14,
-    color: 'gray',
+    color: COLORS.ITEM_TEXT,
   },
   orderTotal: {
     flexDirection: 'row',
@@ -152,16 +169,29 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'white',
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: '600',
+    color: COLORS.TEXT,
   },
   totalAmount: {
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.PRIMARY,
+  },
+  paymentButton: {
+    backgroundColor: 'orange',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  paymentButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   emptyState: {
     flex: 1,
@@ -171,7 +201,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: 'gray',
+    color: COLORS.ITEM_TEXT,
     marginTop: 16,
   },
 });

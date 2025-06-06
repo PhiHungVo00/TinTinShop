@@ -1,4 +1,3 @@
-
 import { Tabs } from "expo-router"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { COLORS } from "@/util/constant";
@@ -39,6 +38,10 @@ const UserLayout = () => {
                 tabBarIcon: ({ color, size }) => (
                     <AntDesign name="setting" color={color} size={size} />
                 ),
+            }} />
+            <Tabs.Screen name="payment/index" options={{
+                headerShown: false,
+                href: null,
             }} />
         </Tabs>
     )
