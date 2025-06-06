@@ -1,64 +1,49 @@
 package com.example.TinTin.domain;
 
 import com.example.TinTin.util.SecurityUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.List;
 
 @Entity
-@Table(name = "products")
-@Setter
+@Table(name = "favorite_toppings")
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class Product {
+@NoArgsConstructor
+public class FavoriteTopping {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Tên sản phẩm không được để trống")
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "topping_id")
+    private Topping topping;
 
-    private Boolean active;
-    private String image;
-
-    @Column(columnDefinition = "MEDIUMTEXT")
-    private String description;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<ProductSize> productSizes;
-
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<FavoriteProduct> favoriteProducts;
-
     @PrePersist
-    public void preCreateProduct() {
+    public void preCreateFavoriteTopping() {
         this.createdAt = Instant.now();
         this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
     }
 
     @PreUpdate
-    public void preUpdateProduct() {
+    public void preUpdateFavoriteTopping() {
         this.updatedAt = Instant.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get() : "";
     }
+
 }

@@ -5,6 +5,8 @@ import com.example.TinTin.repository.CouponRepository;
 import com.example.TinTin.util.error.DuplicateResourceException;
 import com.example.TinTin.util.error.IdInvalidException;
 import com.example.TinTin.util.error.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -39,17 +41,22 @@ public class CouponService {
                 .orElseThrow(() -> new NotFoundException("Coupon not found with ID: " + id));
     }
 
-    public List<Coupon> getAllCoupons(Specification<Coupon> spec) {
+    public List<Coupon> getAllCoupons(Specification<Coupon> spec, Pageable pageable) {
+        Page<Coupon> couponPage = couponRepository.findAll(spec, pageable);
+        if (couponPage.hasContent()) {
+            return couponPage.getContent();
+        } else {
+            throw new NotFoundException("No coupons found matching the criteria");
+        }
 
-        return couponRepository.findAll(spec);
     }
 
-    public Coupon updateCoupon(Long id, Coupon coupon) {
-        if (id == null) {
+    public Coupon updateCoupon(Coupon coupon) {
+        if (coupon.getId() == null) {
             throw new IdInvalidException("Coupon ID cannot be null for update operation");
         }
-        Coupon existingCoupon = couponRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Coupon not found with ID: " + id));
+        Coupon existingCoupon = couponRepository.findById(coupon.getId())
+                .orElseThrow(() -> new NotFoundException("Coupon not found with ID: " + coupon.getId()));
         if (couponRepository.findByCode(coupon.getCode()).isPresent() &&
                 !existingCoupon.getCode().equals(coupon.getCode())) {
             throw new DuplicateResourceException("Coupon with code '" + coupon.getCode() + "' already exists");

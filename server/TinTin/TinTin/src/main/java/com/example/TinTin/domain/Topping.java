@@ -48,6 +48,10 @@ public class Topping {
     @JsonIgnore
     private List<OrderDetail> orderDetails;
 
+    @OneToMany(mappedBy = "topping", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<FavoriteTopping> favoriteToppings;
+
     @PrePersist
     public void preCreateTopping() {
         this.createdAt = Instant.now();
