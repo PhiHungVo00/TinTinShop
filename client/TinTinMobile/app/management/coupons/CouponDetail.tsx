@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import ShareTextInput from "@/components/ShareTextInput";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ProfileInput from "@/components/ProfileInput";
 import * as ImagePicker from 'expo-image-picker';
@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import { ICoupon } from "@/types/backend";
 import { DiscountType } from "@/types/enums/DiscountType.enum";
+import { callGetCouponById } from "@/config/api";
 
 const image = {
     coupon_default: require("@/assets/images/coupon/coupon_default.png"),
@@ -30,21 +31,24 @@ const DISCOUNT_TYPES = ["PERCENT", "AMOUNT"];
 
 const CouponDetail = () => {
     const { showActionSheetWithOptions } = useActionSheet();
-    const { couponDataStr } = useLocalSearchParams();
-    let couponData: ICoupon = couponDataStr ? JSON.parse(decodeURIComponent(couponDataStr as string)) : null;
+    const { id } = useLocalSearchParams();
 
-    const [code, setCode] = useState<string>(couponData?.code || "");
-    const [description, setDescription] = useState<string>(couponData?.description || "");
-    const [discountType, setDiscountType] = useState<string>(couponData?.discountType || "PERCENT");
-    const [discountValue, setDiscountValue] = useState<string>(couponData?.discountValue?.toString() || "");
-    const [maxDiscount, setMaxDiscount] = useState<string>(couponData?.maxDiscount?.toString() || "");
-    const [minOrderValue, setMinOrderValue] = useState<string>(couponData?.minOrderValue?.toString() || "");
-    const [quantity, setQuantity] = useState<string>(couponData?.quantity?.toString() || "");
-    const [startDate, setStartDate] = useState<string>(couponData?.startDate || "");
-    const [endDate, setEndDate] = useState<string>(couponData?.endDate || "");
-    const [isActive, setIsActive] = useState<boolean>(couponData?.isActive || false);
-    const [imageUri, setImageUri] = useState<string>(`${image_url_base}/coupon/${couponData?.image}`);
-    const [imageFileName, setImageFileName] = useState<string>(couponData?.image || "");
+    const [couponData, setCouponData] = useState<ICoupon | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    // Khởi tạo state với giá trị mặc định
+    const [code, setCode] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [discountType, setDiscountType] = useState<string>("PERCENT");
+    const [discountValue, setDiscountValue] = useState<string>("");
+    const [maxDiscount, setMaxDiscount] = useState<string>("");
+    const [minOrderValue, setMinOrderValue] = useState<string>("");
+    const [quantity, setQuantity] = useState<string>("");
+    const [startDate, setStartDate] = useState<string>("");
+    const [endDate, setEndDate] = useState<string>("");
+    const [isActive, setIsActive] = useState<boolean>(false);
+    const [imageUri, setImageUri] = useState<string>("");
+    const [imageFileName, setImageFileName] = useState<string>("");
     
     const [isStartDatePickerVisible, setStartDatePickerVisible] = useState<boolean>(false);
     const [isEndDatePickerVisible, setEndDatePickerVisible] = useState<boolean>(false);
@@ -59,6 +63,49 @@ const CouponDetail = () => {
     const [quantityError, setQuantityError] = useState<string>("");
     const [startDateError, setStartDateError] = useState<string>("");
     const [endDateError, setEndDateError] = useState<string>("");
+
+    // Fetch coupon data
+    useEffect(() => {
+        const fetchCouponData = async () => {
+            try {
+                setLoading(true);
+                const res = await callGetCouponById(id as string);
+                if (res.data) {
+                    setCouponData(res.data);
+                }
+            } catch (error) {
+                console.error("Error fetching coupon:", error);
+                Toast.show({
+                    text1: "Lỗi khi tải dữ liệu coupon",
+                    type: "error",
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) {
+            fetchCouponData();
+        }
+    }, [id]);
+
+    // Update state when couponData changes
+    useEffect(() => {
+        if (couponData) {
+            setCode(couponData.code || "");
+            setDescription(couponData.description || "");
+            setDiscountType(couponData.discountType || "PERCENT");
+            setDiscountValue(couponData.discountValue?.toString() || "");
+            setMaxDiscount(couponData.maxDiscount?.toString() || "");
+            setMinOrderValue(couponData.minOrderValue?.toString() || "");
+            setQuantity(couponData.quantity?.toString() || "");
+            setStartDate(couponData.startDate || "");
+            setEndDate(couponData.endDate || "");
+            setIsActive(couponData.isActive || false);
+            setImageUri(`${image_url_base}/coupon/${couponData.image}`);
+            setImageFileName(couponData.image || "");
+        }
+    }, [couponData]);
 
     const showStartDatePicker = () => setStartDatePickerVisible(true);
     const hideStartDatePicker = () => setStartDatePickerVisible(false);
@@ -265,6 +312,27 @@ const CouponDetail = () => {
     const getDiscountTypeDisplayName = (type: string) => {
         return type === "PERCENT" ? "Phần trăm (%)" : "Số tiền cố định (VNĐ)";
     };
+
+    // Show loading state
+    if (loading) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={styles.loadingText}>Đang tải...</Text>
+            </View>
+        );
+    }
+
+    // Show error if no data
+    if (!couponData) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={styles.errorText}>Không tìm thấy dữ liệu coupon</Text>
+                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                    <Text style={styles.buttonText}>Quay lại</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 
     return (
         <View style={[styles.container, { paddingBottom: 100 }]}>
@@ -477,6 +545,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold",
         color: COLORS.ITEM_TEXT,
+    },
+    loadingText: {
+        fontSize: 16,
+        color: COLORS.ITEM_TEXT,
+        textAlign: 'center',
     },
     imageWrapper: {
         alignSelf: 'center',

@@ -235,8 +235,13 @@ export const callGetToppingById = (id: string) => {
     return axios.get<IBackendRes<ITopping>>(`/api/v1/toppings/${id}`);
 }
 
-export const callGetToppings = () => {
-    return axios.get<IBackendRes<ITopping[]>>(`/api/v1/toppings`);
+export const callGetToppings = ({filter}: {
+    filter?: string
+}) => {
+    const params = new URLSearchParams();
+
+    if (filter) params.append("filter", filter);
+    return axios.get<IBackendRes<ITopping[]>>(`/api/v1/toppings?${params.toString()}`);
 }
 
 export const callUpdateTopping = (topping: ITopping) => {

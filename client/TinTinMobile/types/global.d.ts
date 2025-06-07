@@ -31,3 +31,8 @@ declare module 'lodash';
 declare module 'axios' {
     export interface AxiosResponse<T = any> extends Promise<T> { }
 }
+
+export type RootStackParamList = {
+    Home: undefined; // màn hình Home không truyền params
+    CouponDetail: { couponData: ICoupon }; // màn hình CouponDetail truyền params couponData kiểu ICoupon
+  };
