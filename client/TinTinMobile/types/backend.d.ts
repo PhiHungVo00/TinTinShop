@@ -73,20 +73,20 @@ export interface IRole {
   name: string;
   description: string;
   active: boolean;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  updatedBy: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
   permissions: {
     id: string;
     name: string;
     apiPath: string;
     method: string;
     module: string;
-    createdAt: string;
-    updatedAt: string;
-    createdBy: string;
-    updatedBy: string;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
   }[];
 }
 
@@ -109,8 +109,25 @@ export interface IAddressUser {
   };
 }
 
+export interface IAddressUserRes {
+  id: string;
+  addressLine: string;
+  ward: string;
+  district: string;
+  province: string;
+  receiverName: string;
+  receiverPhone: string;
+  description: string;
+  defaultAddress: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+    
+}
+
 export interface ICoupon {
-  id?: number;
+  id?: string;
   code: string;
   description: string;
   image: string;
@@ -129,3 +146,29 @@ export interface ICoupon {
   
 
 }
+
+export interface ICategory {
+  id: string;
+  name: string;
+  active: boolean;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface ITopping {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+  status: ToppingStatus;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+
