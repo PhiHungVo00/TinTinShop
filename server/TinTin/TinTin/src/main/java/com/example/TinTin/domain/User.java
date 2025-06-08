@@ -61,6 +61,14 @@ public class User {
     @JsonIgnore
     private List<Order> orders;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<FavoriteProduct> favoriteProducts;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<FavoriteTopping> favoriteToppings;
+
     @PrePersist
     public void preCreateUser(){
         this.createdAt = Instant.now();

@@ -36,8 +36,8 @@ public class OrderDetail {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "total_price", precision = 10, scale = 2)
-    private BigDecimal totalPrice;
+    @Column(name = "price", precision = 10, scale = 2)
+    private BigDecimal price;
 
     private Instant createdAt;
     private Instant updatedAt;

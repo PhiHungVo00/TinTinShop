@@ -1,6 +1,7 @@
 package com.example.TinTin.domain;
 
 import com.example.TinTin.util.SecurityUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "address_user")
@@ -50,6 +52,11 @@ public class AddressUser {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
+
+    @OneToMany(mappedBy = "addressUser", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Order> orders;
+
     @PrePersist
     public void preCreateAddressUser() {
         this.createdAt = Instant.now();

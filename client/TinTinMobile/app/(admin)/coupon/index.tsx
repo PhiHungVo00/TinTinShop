@@ -1,11 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, KeyboardAvoidingView, Animated } from "react-native";
 import { COLORS } from "@/util/constant";
 import HeaderList from "@/components/HeaderList";
 import { router } from "expo-router";
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Octicons from '@expo/vector-icons/Octicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import ShareTextInput from "@/components/ShareTextInput";
 import ItemCoupon from "@/components/ItemCoupon";
 import { callDeleteCoupon, callGetCoupons } from "@/config/api";
@@ -32,6 +33,10 @@ const CouponsScreen = () => {
     const [itemDelete, setItemDelete] = useState<ICoupon>();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { user } = useAppContext();
+
+    // Animation cho sort icon
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const rotateAnim = useRef(new Animated.Value(0)).current;
 
     const createFilter = (filterCode: string, filterStatus: string) => {
         let filter = "";
@@ -115,9 +120,34 @@ const CouponsScreen = () => {
         router.push({
             pathname: "/management/coupons/CouponDetail",
             params: {
-                couponDataStr: JSON.stringify(item)
+                id: item.id
             }
         })
+    }
+
+    const handleSortPress = () => {
+        // Animation khi nhấn sort
+        Animated.sequence([
+            Animated.parallel([
+                Animated.timing(scaleAnim, {
+                    toValue: 0.8,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(rotateAnim, {
+                    toValue: sort === "id,asc" ? 1 : 0,
+                    duration: 200,
+                    useNativeDriver: true,
+                })
+            ]),
+            Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+            })
+        ]).start();
+
+        setSort(sort === "id,asc" ? "id,desc" : "id,asc");
     }
 
     const handleConfirmDeleteCoupon = async (item: ICoupon) => {
@@ -146,6 +176,12 @@ const CouponsScreen = () => {
         setVisible(false);
     }
 
+    // Tính toán rotation cho icon
+    const rotateInterpolate = rotateAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg']
+    });
+
     return (
         <KeyboardAvoidingView behavior="padding" style={styles.container}>
             <View style={styles.container}>
@@ -172,15 +208,36 @@ const CouponsScreen = () => {
 
                 <View style={styles.searchContainer}>
                     <TouchableOpacity
-                        onPress={() => {
-                            setSort(sort === "id,asc" ? "id,desc" : "id,asc");
-                        }}
+                        onPress={handleSortPress}
+                        style={[
+                            styles.sortButton,
+                            { backgroundColor: sort === "id,desc" ? COLORS.BLUE_LIGHT : COLORS.ITEM_BACKGROUND }
+                        ]}
+                        activeOpacity={0.7}
                     >
-                        <Ionicons
-                            name="swap-vertical"
-                            size={24}
-                            color={sort === "id,asc" ? COLORS.ITEM_TEXT : "orange"} 
-                        />
+                        <Animated.View
+                            style={[
+                                styles.sortIconContainer,
+                                {
+                                    transform: [
+                                        { scale: scaleAnim },
+                                        { rotate: rotateInterpolate }
+                                    ]
+                                }
+                            ]}
+                        >
+                            <MaterialIcons
+                                name="arrow-upward"
+                                size={20}
+                                color={sort === "id,desc" ? "white" : COLORS.ITEM_TEXT}
+                            />
+                        </Animated.View>
+                        <Text style={[
+                            styles.sortText,
+                            { color: sort === "id,desc" ? "white" : COLORS.ITEM_TEXT }
+                        ]}>
+                            {sort === "id,desc" ? "Mới nhất" : "Cũ nhất"}
+                        </Text>
                     </TouchableOpacity>
 
                     <ShareTextInput
@@ -194,7 +251,7 @@ const CouponsScreen = () => {
                         icon={<Ionicons name="search" size={24} color={COLORS.ITEM_TEXT} />}
                     />
                     
-                    <TouchableOpacity>
+                    <TouchableOpacity style={styles.filterButton}>
                         <Octicons name="filter" size={24} color={COLORS.ITEM_TEXT} />
                     </TouchableOpacity>
                 </View>
@@ -262,7 +319,28 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         marginVertical: 0,
-        width: "80%",
+        flex: 1,
+        marginHorizontal: 12,
+    },
+    sortButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: COLORS.BLUE_LIGHT,
+        minWidth: 90,
+    },
+    sortIconContainer: {
+        marginRight: 4,
+    },
+    sortText: {
+        fontSize: 12,
+        fontWeight: "500",
+    },
+    filterButton: {
+        padding: 8,
     },
 });
 
