@@ -1,4 +1,4 @@
-import { IAccount, IAddressUser, IBackendRes, IFile, IGetAccount, IModelPaginate, IRole, IUser } from "@/types/backend"
+import { IAccount, IAddressUser, IBackendRes, IFile, IGetAccount, IModelPaginate, IRole, IUser, ICoupon, ITopping } from "@/types/backend"
 import axios from "./axios-customize"
 
 /**
@@ -114,4 +114,50 @@ export const updateAddress = (address: IAddressUser) => {
 
 export const deleteAddress = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/addresses-user/${id}`)
+}
+
+/**
+ * Module Coupon
+ */
+export const getCoupons = () => {
+    return axios.get<IBackendRes<ICoupon[]>>('/api/v1/coupons');
+}
+
+export const getCouponById = (id: string) => {
+    return axios.get<IBackendRes<ICoupon>>(`/api/v1/coupons/${id}`);
+}
+
+export const createCoupon = (coupon: ICoupon) => {
+    return axios.post<IBackendRes<ICoupon>>('/api/v1/coupons', coupon);
+}
+
+export const updateCoupon = (id: string, coupon: ICoupon) => {
+    return axios.put<IBackendRes<ICoupon>>(`/api/v1/coupons/${id}`, coupon);
+}
+
+export const deleteCoupon = (id: string) => {
+    return axios.delete<IBackendRes<ICoupon>>(`/api/v1/coupons/${id}`);
+}
+
+/**
+ * Module Topping
+ */
+export const getToppings = () => {
+    return axios.get<IBackendRes<ITopping[]>>('/api/v1/toppings');
+}
+
+export const getToppingById = (id: string) => {
+    return axios.get<IBackendRes<ITopping>>(`/api/v1/toppings/${id}`);
+}
+
+export const createTopping = (topping: ITopping) => {
+    return axios.post<IBackendRes<ITopping>>('/api/v1/toppings', topping);
+}
+
+export const updateTopping = (topping: ITopping) => {
+    return axios.put<IBackendRes<ITopping>>('/api/v1/toppings', topping);
+}
+
+export const deleteTopping = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/toppings/${id}`);
 }
