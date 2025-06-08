@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
@@ -6,6 +6,12 @@ import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { useState, useMemo } from 'react';
 import { router } from 'expo-router';
 import { useFavorites } from '@/context/FavoritesContext';
+import { useAppContext } from '@/context/AppContext';
+import { callGetProducts, callGetToppings, callGetProductFavoritesOfUser, callGetToppingFavoritesOfUser } from '@/config/api';
+
+const IPV4 = process.env.EXPO_PUBLIC_IPV4;
+const PORT = process.env.EXPO_PUBLIC_PORT;
+const image_url_base = `http://${IPV4}:${PORT}/storage`;
 
 export const allProducts = [
   // Cà phê
@@ -56,28 +62,71 @@ const categories = ['All', 'Cà phê', 'Trà', 'Trà sữa', 'Sinh tố', 'Nư�
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchText, setSearchText] = useState('');
-  const { favorites, favoriteToppings, toggleFavorite, toggleFavoriteTopping } = useFavorites();
+  const [products, setProducts] = useState(allProducts);
+  const [toppingsData, setToppingsData] = useState(toppings);
+  const { user } = useAppContext();
+  const {
+    favorites,
+    favoriteToppings,
+    toggleFavorite,
+    toggleFavoriteTopping,
+    setFavoritesList,
+    setFavoriteToppingsList,
+  } = useFavorites();
 
-  // TODO: Gọi API lấy danh sách sản phẩm
-  // const fetchProducts = async () => {
-  //   const response = await callGetProducts();
-  //   setProducts(response.data);
-  // };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productRes, toppingRes] = await Promise.all([
+          callGetProducts({}),
+          callGetToppings({}),
+        ]);
 
-  // TODO: Gọi API lấy danh sách topping
-  // const fetchToppings = async () => {
-  //   const response = await callGetToppings();
-  //   setToppings(response.data);
-  // };
+        if (productRes.data) {
+          const mapped = productRes.data.map((p: any) => ({
+            id: Number(p.id),
+            name: p.name,
+            subtitle: p.description || '',
+            image: { uri: `${image_url_base}/product/${p.image}` },
+            price: '0',
+            rating: 0,
+            category: p.category?.name || '',
+          }));
+          setProducts(mapped);
+        }
 
-  // TODO: Gọi API lấy danh sách yêu thích của user
-  // const fetchFavorites = async () => {
-  //   const response = await callGetFavorites();
-  //   setFavorites(response.data);
-  // };
+        if (toppingRes.data) {
+          const mappedT = toppingRes.data.map((t: any) => ({
+            id: Number(t.id),
+            name: t.name,
+            subtitle: t.description || '',
+            image: { uri: `${image_url_base}/topping/${t.image}` },
+            price: t.price?.toString() || '0',
+          }));
+          setToppingsData(mappedT);
+        }
+
+        if (user?.user.id) {
+          const [favProdRes, favTopRes] = await Promise.all([
+            callGetProductFavoritesOfUser(user.user.id),
+            callGetToppingFavoritesOfUser(user.user.id),
+          ]);
+          if (favProdRes.data) {
+            setFavoritesList(favProdRes.data.map((f: any) => Number(f.product.id)));
+          }
+          if (favTopRes.data) {
+            setFavoriteToppingsList(favTopRes.data.map((f: any) => Number(f.topping.id)));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching home data', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const filteredProducts = useMemo(() => {
-    let filtered = allProducts;
+    let filtered = products;
     
     // Filter by category
     if (activeCategory !== 'All') {
@@ -96,7 +145,7 @@ export default function HomeScreen() {
     return filtered;
   }, [activeCategory, searchText]);
 
-  const renderProductItem = ({ item }: { item: typeof allProducts[0] }) => (
+  const renderProductItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.productCard}>
       <Image source={item.image} style={styles.productImage} />
       <TouchableOpacity 
@@ -125,7 +174,7 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
-  const renderToppingItem = ({ item }: { item: typeof toppings[0] }) => (
+  const renderToppingItem = ({ item }: { item: any }) => (
     <TouchableOpacity style={styles.toppingCard}>
       <Image source={item.image} style={styles.toppingImage} />
       <TouchableOpacity 
@@ -150,7 +199,7 @@ export default function HomeScreen() {
     if (activeCategory === 'Topping') {
       return (
         <FlatList
-          data={toppings}
+          data={toppingsData}
           renderItem={renderToppingItem}
           keyExtractor={(item) => item.id.toString()}
           horizontal={false} 
@@ -217,11 +266,11 @@ export default function HomeScreen() {
         {renderContent()}
 
         {}
-        {activeCategory !== 'Topping' && toppings.length > 0 && (
+        {activeCategory !== 'Topping' && toppingsData.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Topping kèm theo</Text>
             <FlatList
-              data={toppings}
+              data={toppingsData}
               renderItem={renderToppingItem}
               keyExtractor={(item) => item.id.toString()}
               horizontal

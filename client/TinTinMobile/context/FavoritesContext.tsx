@@ -5,6 +5,8 @@ interface FavoritesContextType {
   favoriteToppings: number[];
   toggleFavorite: (id: number) => void;
   toggleFavoriteTopping: (id: number) => void;
+  setFavoritesList: (ids: number[]) => void;
+  setFavoriteToppingsList: (ids: number[]) => void;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
@@ -20,13 +22,30 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const toggleFavoriteTopping = (id: number) => {
-    setFavoriteToppings(prev => 
+    setFavoriteToppings(prev =>
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
 
+  const setFavoritesList = (ids: number[]) => {
+    setFavorites(ids);
+  };
+
+  const setFavoriteToppingsList = (ids: number[]) => {
+    setFavoriteToppings(ids);
+  };
+
   return (
-    <FavoritesContext.Provider value={{ favorites, favoriteToppings, toggleFavorite, toggleFavoriteTopping }}>
+    <FavoritesContext.Provider
+      value={{
+        favorites,
+        favoriteToppings,
+        toggleFavorite,
+        toggleFavoriteTopping,
+        setFavoritesList,
+        setFavoriteToppingsList,
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
