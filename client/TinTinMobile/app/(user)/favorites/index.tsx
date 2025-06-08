@@ -1,43 +1,61 @@
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
-const favoriteProducts = [
-  { id: 1, name: 'Cà phê sữa', image: require('@/assets/Food/Coffeemilk.jpg'), price: '25.000đ' },
-  { id: 2, name: 'Trà sữa trân châu', image: require('@/assets/Food/Tranchauden.jpg'), price: '30.000đ' },
-  { id: 3, name: 'Trà đào', image: require('@/assets/Food/Dao.jpg'), price: '35.000đ' },
-];
+import { useFavorites } from '@/context/FavoritesContext';
+import { allProducts } from '@/app/(user)/home';
+import { router } from 'expo-router';
 
 export default function FavoritesScreen() {
-  return (
+  const { favorites, toggleFavorite } = useFavorites();
+
+  const favoriteProductsData = allProducts.filter(product => favorites.includes(product.id));
+
+  const renderProduct = ({ item }: { item: typeof allProducts[0] }) => (
+    <TouchableOpacity style={styles.productCard}>
+      <Image source={item.image} style={styles.productImage} />
+      <TouchableOpacity 
+        style={styles.favoriteButton}
+        onPress={() => toggleFavorite(item.id)}
+      >
+        <AntDesign name="heart" size={16} color="#FF0000" />
+      </TouchableOpacity>
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <Text style={styles.productSubtitle}>{item.subtitle}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.productPrice}>{item.price} VNĐ</Text>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => router.push({ pathname: "/product/detail", params: { product: JSON.stringify(item) } })}
+          >
+            <AntDesign name="plus" size={16} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+    return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Yêu thích</Text>
+        <Text style={styles.headerTitle}>TINTIN-Yêu thích</Text>
       </View>
-      <ScrollView style={styles.scrollView}>
-        {favoriteProducts.length > 0 ? (
-          <View style={styles.productsList}>
-            {favoriteProducts.map((product) => (
-              <TouchableOpacity key={product.id} style={styles.productCard}>
-                <Image source={product.image} style={styles.productImage} />
-                <View style={styles.productInfo}>
-                  <Text style={styles.productName}>{product.name}</Text>
-                  <Text style={styles.productPrice}>{product.price}</Text>
-                </View>
-                <TouchableOpacity style={styles.favoriteButton}>
-                  <AntDesign name="heart" size={24} color={COLORS.PRIMARY} />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ) : (
-          <View style={styles.emptyState}>
-            <AntDesign name="heart" size={64} color={COLORS.PRIMARY} />
-            <Text style={styles.emptyStateText}>Chưa có sản phẩm yêu thích</Text>
-          </View>
-        )}
-      </ScrollView>
+      {favoriteProductsData.length > 0 ? (
+        <FlatList
+          data={favoriteProductsData}
+          renderItem={renderProduct}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.productsList}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={styles.emptyState}>
+          <AntDesign name="heart" size={64} color={COLORS.PRIMARY} />
+          <Text style={styles.emptyStateText}>Chưa có sản phẩm yêu thích</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -49,52 +67,75 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 16,
-    backgroundColor: COLORS.PRIMARY,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
-  },
-  scrollView: {
-    flex: 1,
+    color: COLORS.TEXT,
   },
   productsList: {
-    padding: 16,
+    padding: 8,
   },
   productCard: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderRadius: 8,
+    flex: 1,
+    backgroundColor: COLORS.ITEM_BACKGROUND,
+    borderRadius: 12,
+    marginHorizontal: 8,
     marginBottom: 16,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingBottom: 12,
+    maxWidth: '48%', 
+    alignItems: 'center',
   },
   productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: '100%',
+    height: 120,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    marginBottom: 8,
   },
   productInfo: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'center',
+    paddingHorizontal: 12,
+    width: '100%',
   },
   productName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.TEXT,
+    marginBottom: 4,
+  },
+  productSubtitle: {
+    fontSize: 12,
+    color: COLORS.ITEM_TEXT,
+    marginBottom: 8,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   productPrice: {
     fontSize: 14,
+    fontWeight: 'bold',
     color: COLORS.PRIMARY,
-    marginTop: 4,
+    marginRight: 4,
+  },
+  addButton: {
+    backgroundColor: 'orange',
+    borderRadius: 20,
+    padding: 6,
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   favoriteButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
     padding: 8,
+    zIndex: 1,
   },
   emptyState: {
     flex: 1,

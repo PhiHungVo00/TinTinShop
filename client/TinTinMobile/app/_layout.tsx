@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import CustomToast from "@/components/CustomToast";
 import { AppProvider } from "@/context/AppContext";
+import { FavoritesProvider } from "@/context/FavoritesContext";
+import { OrderProvider } from "@/context/OrderContext";
 import { COLORS } from "@/util/constant";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
@@ -35,11 +37,15 @@ export default function RootLayout() {
        <ActionSheetProvider>
       <LoadingProvider>
         <AppProvider>
-          <StatusBar hidden />
-          <Stack screenOptions={{ headerShown: false }} />
-          <WithLoadingHandler />
-          <LoadingModal />
-          <Toast config={toastConfig} />
+          <FavoritesProvider>
+            <OrderProvider>
+              <StatusBar hidden />
+              <Stack screenOptions={{ headerShown: false }} />
+              <WithLoadingHandler />
+              <LoadingModal />
+              <Toast config={toastConfig} />
+            </OrderProvider>
+          </FavoritesProvider>
         </AppProvider>
       </LoadingProvider>
       </ActionSheetProvider>
