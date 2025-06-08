@@ -42,12 +42,13 @@ export const allProducts = [
   { id: 21, name: 'Matcha đá xay', subtitle: 'Đá xay', image: require('@/assets/Food/Matcha.webp'), price: '25.000', rating: 4.5, category: 'Đá xay' },
 ];
 
-const toppings = [
+export const toppings = [
   { id: 1, name: 'Trân châu đen', subtitle: 'Trân châu giòn ngon', image: require('@/assets/Food/Tranchauden.webp'), price: '3.000' },
   { id: 2, name: 'Thạch dừa', subtitle: 'Thạch dừa siêu ngọt', image: require('@/assets/Food/Thach.webp'), price: '3.000' },
   { id: 3, name: 'Sương sáo', subtitle: 'Sương sáo dai ngọt', image: require('@/assets/Food/Sao.jpg'), price: '3.000' },
   { id: 4, name: 'Hạt lựu', subtitle: 'Hạt lựu ngọt ngào', image: require('@/assets/Food/Nade.jpg'), price: '3.000' },
   { id: 5, name: 'Đá viên', subtitle: 'Đá thêm', image: require('@/assets/Food/Ice.png'), price: '3.000' },
+  { id: 6, name: 'Sữa đặc', subtitle: 'Sữa đặc ngọt ngào', image: require('@/assets/Food/Milk.jpg'), price: '3.000' },
 ];
 
 const categories = ['All', 'Cà phê', 'Trà', 'Trà sữa', 'Sinh tố', 'Nước ép', 'Đá xay', 'Topping'];
@@ -55,14 +56,45 @@ const categories = ['All', 'Cà phê', 'Trà', 'Trà sữa', 'Sinh tố', 'Nư�
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchText, setSearchText] = useState('');
-  const { favorites, toggleFavorite } = useFavorites();
+  const { favorites, favoriteToppings, toggleFavorite, toggleFavoriteTopping } = useFavorites();
+
+  // TODO: Gọi API lấy danh sách sản phẩm
+  // const fetchProducts = async () => {
+  //   const response = await callGetProducts();
+  //   setProducts(response.data);
+  // };
+
+  // TODO: Gọi API lấy danh sách topping
+  // const fetchToppings = async () => {
+  //   const response = await callGetToppings();
+  //   setToppings(response.data);
+  // };
+
+  // TODO: Gọi API lấy danh sách yêu thích của user
+  // const fetchFavorites = async () => {
+  //   const response = await callGetFavorites();
+  //   setFavorites(response.data);
+  // };
 
   const filteredProducts = useMemo(() => {
-    if (activeCategory === 'All') {
-      return allProducts;
+    let filtered = allProducts;
+    
+    // Filter by category
+    if (activeCategory !== 'All') {
+      filtered = filtered.filter(product => product.category === activeCategory);
     }
-    return allProducts.filter(product => product.category === activeCategory);
-  }, [activeCategory]);
+    
+    // Filter by search text
+    if (searchText.trim()) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter(product => 
+        product.name.toLowerCase().includes(searchLower) ||
+        product.subtitle.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    return filtered;
+  }, [activeCategory, searchText]);
 
   const renderProductItem = ({ item }: { item: typeof allProducts[0] }) => (
     <TouchableOpacity style={styles.productCard}>
@@ -96,6 +128,16 @@ export default function HomeScreen() {
   const renderToppingItem = ({ item }: { item: typeof toppings[0] }) => (
     <TouchableOpacity style={styles.toppingCard}>
       <Image source={item.image} style={styles.toppingImage} />
+      <TouchableOpacity 
+        style={styles.favoriteButton}
+        onPress={() => toggleFavoriteTopping(item.id)}
+      >
+        <AntDesign 
+          name={favoriteToppings.includes(item.id) ? "heart" : "hearto"} 
+          size={16} 
+          color={favoriteToppings.includes(item.id) ? "#FF0000" : "#FFFFFF"} 
+        />
+      </TouchableOpacity>
       <View style={styles.toppingInfo}>
         <Text style={styles.toppingName}>{item.name}</Text>
         <Text style={styles.toppingSubtitle}>{item.subtitle}</Text>

@@ -1,24 +1,64 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import { AntDesign } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import Toast from "react-native-toast-message";
+import { useCart } from '@/context/CartContext';
+import { useOrders } from '@/context/OrderContext';
 
 const PaymentScreen = () => {
-  const { orderId, total } = useLocalSearchParams();
-  const totalAmount = total; 
-  const walletBalance = '1.000.000'; 
+  const { total } = useLocalSearchParams();
+  const totalAmount = total;
+  const walletBalance = '1.000.000';
   const [isProcessing, setIsProcessing] = useState(false);
+  const { items, clearCart } = useCart();
+  const { addOrder } = useOrders();
 
   const handlePayment = async (method: string) => {
     try {
       setIsProcessing(true);
-      // TODO: Gọi API thanh toán ở đây
-      // const response = await callPaymentAPI(orderId, method);
-      // Giả lập delay để hiển thị loading
+      // TODO: Gọi API thanh toán
+      // const response = await callPaymentAPI({
+      //   orderId,
+      //   method,
+      //   amount: totalAmount,
+      //   items: items
+      // });
+      // if (response.success) {
+      //   // Xử lý sau khi thanh toán thành công
+      //   addOrder(newOrder);
+      //   clearCart();
+      //   Toast.show({
+      //     type: 'success',
+      //     text1: `Thanh toán thành công qua ${method}`,
+      //   });
+      //   router.replace('/(user)/orders');
+      // }
       await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Tạo đơn hàng mới từ giỏ hàng
+      const newOrder = {
+        id: Date.now().toString(),
+        date: new Date().toLocaleDateString('vi-VN'),
+        status: 'Đã hoàn thành',
+        items: items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          size: item.size,
+          ice: item.ice,
+          sugar: item.sugar,
+          toppings: item.toppings,
+          toppingPrice: item.toppingPrice,
+        })),
+        total: totalAmount.toString(),
+      };
+
+      // Thêm đơn hàng mới và xóa giỏ hàng
+      addOrder(newOrder);
+      clearCart();
 
       Toast.show({
         type: 'success',

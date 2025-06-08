@@ -27,10 +27,16 @@ const UserLayout = () => {
                     <AntDesign name="heart" color={color} size={size} />
                 ),
             }} />
+            <Tabs.Screen name="cart/index" options={{
+                title: 'Cart',
+                tabBarIcon: ({ color, size }) => (
+                    <AntDesign name="shoppingcart" color={color} size={size} />
+                ),
+            }} />
             <Tabs.Screen name="orders/index" options={{
                 title: 'Orders',
                 tabBarIcon: ({ color, size }) => (
-                    <AntDesign name="shoppingcart" color={color} size={size} />
+                    <AntDesign name="profile" color={color} size={size} />
                 ),
             }} />
             <Tabs.Screen name="settings/index" options={{

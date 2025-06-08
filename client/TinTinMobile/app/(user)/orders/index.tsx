@@ -31,7 +31,7 @@ export default function OrdersScreen() {
   // Refresh orders when screen is focused
   useFocusEffect(
     useCallback(() => {
-      // TODO: Fetch orders from API
+      // TODO: Gọi API lấy danh sách đơn hàng của user
       // const fetchOrders = async () => {
       //   const response = await callGetOrders();
       //   setOrders(response.data);
@@ -47,7 +47,14 @@ export default function OrdersScreen() {
         pathname: '/(user)/payment',
         params: { orderId, total: orderToPay.total }
       });
-      // Simulate successful payment after navigation (for demonstration)
+      // TODO: Gọi API cập nhật trạng thái đơn hàng sau khi thanh toán
+      // const updateOrder = async () => {
+      //   const response = await callUpdateOrderStatus(orderId, 'Đã hoàn thành');
+      //   if (response.success) {
+      //     updateOrderStatus(orderId, 'Đã hoàn thành');
+      //   }
+      // };
+      // updateOrder();
       updateOrderStatus(orderId, 'Đã hoàn thành');
     }
   };

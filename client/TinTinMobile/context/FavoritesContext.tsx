@@ -2,24 +2,31 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface FavoritesContextType {
   favorites: number[];
-  toggleFavorite: (productId: number) => void;
+  favoriteToppings: number[];
+  toggleFavorite: (id: number) => void;
+  toggleFavoriteTopping: (id: number) => void;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [favoriteToppings, setFavoriteToppings] = useState<number[]>([]);
 
-  const toggleFavorite = (productId: number) => {
-    setFavorites(prev =>
-      prev.includes(productId)
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
+  const toggleFavorite = (id: number) => {
+    setFavorites(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const toggleFavoriteTopping = (id: number) => {
+    setFavoriteToppings(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, toggleFavorite }}>
+    <FavoritesContext.Provider value={{ favorites, favoriteToppings, toggleFavorite, toggleFavoriteTopping }}>
       {children}
     </FavoritesContext.Provider>
   );
