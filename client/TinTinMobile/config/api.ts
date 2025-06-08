@@ -177,6 +177,10 @@ export const callDeleteCategory = (id: string) => {
 export const callUpdateCategory = (category: ICategory) => {
     return axios.put<IBackendRes<ICategory>>(`/api/v1/categories`, category)
 }
+
+export const callGetCategoryById = (id: string) => {
+    return axios.get<IBackendRes<ICategory>>(`/api/v1/categories/${id}`)
+}
 /**
  * 
 Module product

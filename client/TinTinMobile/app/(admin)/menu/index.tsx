@@ -140,7 +140,7 @@ const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
             subtitle={item.description || 'Không có mô tả'}
             status={item.active}
             icon="grid-outline"
-            onPress={() => navigation.navigate('CategoryDetail', { categoryId: item.id })}
+            onPress={() => router.push({ pathname: "/management/categories/CategoryDetail", params: { id: item.id } })}
         />
     );
 
