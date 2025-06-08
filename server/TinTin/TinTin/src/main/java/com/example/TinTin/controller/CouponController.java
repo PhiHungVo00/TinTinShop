@@ -5,6 +5,7 @@ import com.example.TinTin.domain.response.coupon.CouponDTO;
 import com.example.TinTin.service.CouponService;
 import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +24,7 @@ public class CouponController {
     }
 
     @PostMapping("/coupons")
-    public ResponseEntity<Coupon> createCoupon(@Valid @RequestBody CouponDTO couponDTO) {
-        Coupon coupon = new Coupon();
-        coupon.setCode(couponDTO.getCode());
-        coupon.setDescription(couponDTO.getDescription());
-        coupon.setImage(couponDTO.getImage());
-        coupon.setDiscountType(couponDTO.getDiscountType());
-        coupon.setDiscountValue(couponDTO.getDiscountValue());
-        coupon.setMaxDiscount(couponDTO.getMaxDiscount());
-        coupon.setMinOrderValue(couponDTO.getMinOrderValue());
-        coupon.setQuantity(couponDTO.getQuantity()==null?0:couponDTO.getQuantity());
-        coupon.setStartDate(couponDTO.getStartDate());
-        coupon.setEndDate(couponDTO.getEndDate());
-        coupon.setIsActive(couponDTO.getIsActive() != null ? couponDTO.getIsActive() : true);
+    public ResponseEntity<Coupon> createCoupon(@Valid @RequestBody Coupon coupon) {
         Coupon createdCoupon = couponService.createCoupon(coupon);
         return new ResponseEntity<>(createdCoupon, HttpStatus.CREATED);
     }
@@ -47,26 +36,14 @@ public class CouponController {
     }
 
     @GetMapping("/coupons")
-    public ResponseEntity<List<Coupon>> getAllCoupons(@Filter Specification<Coupon> spec) {
-        List<Coupon> coupons = couponService.getAllCoupons(spec);
+    public ResponseEntity<List<Coupon>> getAllCoupons(@Filter Specification<Coupon> spec, Pageable pageable) {
+        List<Coupon> coupons = couponService.getAllCoupons(spec, pageable);
         return ResponseEntity.ok(coupons);
     }
 
-    @PutMapping("/coupons/{id}")
-    public ResponseEntity<Coupon> updateCoupon(@PathVariable Long id, @Valid @RequestBody CouponDTO couponDTO) {
-        Coupon coupon = new Coupon();
-        coupon.setCode(couponDTO.getCode());
-        coupon.setDescription(couponDTO.getDescription());
-        coupon.setImage(couponDTO.getImage());
-        coupon.setDiscountType(couponDTO.getDiscountType());
-        coupon.setDiscountValue(couponDTO.getDiscountValue());
-        coupon.setMaxDiscount(couponDTO.getMaxDiscount());
-        coupon.setMinOrderValue(couponDTO.getMinOrderValue());
-        coupon.setQuantity(couponDTO.getQuantity());
-        coupon.setStartDate(couponDTO.getStartDate());
-        coupon.setEndDate(couponDTO.getEndDate());
-        coupon.setIsActive(couponDTO.getIsActive());
-        Coupon updatedCoupon = couponService.updateCoupon(id, coupon);
+    @PutMapping("/coupons")
+    public ResponseEntity<Coupon> updateCoupon( @Valid @RequestBody Coupon coupon) {
+        Coupon updatedCoupon = couponService.updateCoupon( coupon);
         return ResponseEntity.ok(updatedCoupon);
     }
 

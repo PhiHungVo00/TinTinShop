@@ -46,6 +46,10 @@ public class Product {
     @JsonIgnore
     private List<ProductSize> productSizes;
 
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<FavoriteProduct> favoriteProducts;
+
     @PrePersist
     public void preCreateProduct() {
         this.createdAt = Instant.now();

@@ -53,6 +53,6 @@ public class ToppingController {
     @ApiMessage("Delete topping by id")
     public ResponseEntity<Void> deleteTopping(@PathVariable("id") long id) {
         this.toppingService.deleteTopping(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.ok(null);
     }
 }

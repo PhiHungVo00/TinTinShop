@@ -59,8 +59,14 @@ public class CategoryService {
 
         existingCategory.setName(trimmedName);
         existingCategory.setDescription(category.getDescription());
+        existingCategory.setActive(category.getActive());
 
         return categoryRepository.save(existingCategory);
+    }
+
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("Category not found with id: " + id));
     }
 
 }

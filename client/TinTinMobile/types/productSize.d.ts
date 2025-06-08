@@ -6,14 +6,27 @@ export interface IProductSizeReq {
 }
 
 export interface IProductSizeRes {
-    id: number;
-    productId: number;
-    sizeId: number;
+    id: string;
+    productId: string;
+    sizeId: string;
     sizeName: SizeEnum;
     price: number;
     stockQuantity: number;
     status: ProductSizeStatus;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface IProductSize {
+    id: string;
+    product: IProduct;
+    size: ISize;
+    price: number;
+    stockQuantity: number;
+    status: ProductSizeStatus;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    updatedBy: string;
 }
 
