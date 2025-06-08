@@ -36,6 +36,6 @@ public class FavoriteToppingController {
     @ApiMessage("Delete favorite Topping")
     public ResponseEntity<Void> deleteFavoriteTopping(@PathVariable("id") Long id) {
         favoriteToppingService.deleteFavoriteTopping(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(null);
     }
 }

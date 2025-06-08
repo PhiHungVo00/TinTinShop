@@ -76,7 +76,7 @@ public class ToppingService {
         }
         Topping topping = toppingRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Topping not found with id: " + id));
-        topping.setStatus(ToppingStatusEnum.INACTIVE);
+        topping.setStatus(ToppingStatusEnum.DELETED);
         toppingRepository.save(topping);
 
     }

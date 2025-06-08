@@ -47,5 +47,11 @@ public class CategoryController {
         return ResponseEntity.ok().body(this.categoryService.updateCategory(category));
     }
 
+    @GetMapping("/categories/{id}")
+    @ApiMessage("Get category by ID")
+    public ResponseEntity<Category> getCategoryById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok().body(this.categoryService.getCategoryById(id));
+    }
+
 
 }

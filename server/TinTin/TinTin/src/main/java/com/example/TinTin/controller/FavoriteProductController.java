@@ -37,6 +37,6 @@ public class FavoriteProductController {
     @ApiMessage("Delete favorite product")
     public ResponseEntity<Void> deleteFavoriteProduct(@PathVariable("id") Long id) {
         favoriteProductService.deleteFavoriteProduct(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().body(null);
     }
 }
