@@ -158,6 +158,16 @@ export interface ICategory {
   updatedBy?: string;
 }
 
+export interface ISize {
+  id: string;
+  name: string;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
 export interface ITopping {
   id: string;
   name: string;

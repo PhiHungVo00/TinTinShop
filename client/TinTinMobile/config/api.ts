@@ -1,4 +1,4 @@
-import { IAccount, IAddressUser, IBackendRes, ICategory, ICoupon, IFile, IGetAccount, IModelPaginate, IRole, ITopping, IUser } from "@/types/backend"
+import { IAccount, IAddressUser, IBackendRes, ICategory, ICoupon, IFile, IGetAccount, IModelPaginate, IRole, ISize, ITopping, IUser } from "@/types/backend"
 import axios from "./axios-customize"
 import { IProduct, IProductResponseDTO } from "@/types/product"
 import { IProductSizeReq, IProductSizeRes } from "@/types/productSize"
@@ -323,7 +323,18 @@ export const callDeleteToppingFavorite = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/favorite/toppings/${id}`);
 }
 
+/**
+ * 
+ Module size
+ */
+export const callCreateSize = (size: ISize) => {
+    return axios.post<IBackendRes<ISize>>(`/api/v1/sizes`, size);
+}
 
+export const callGetSizes = () => {
+    return axios.get<IBackendRes<ISize[]>>(`/api/v1/sizes`);
+}
 
-
-
+export const callUpdateSize = (size: ISize) => {
+    return axios.put<IBackendRes<ISize>>(`/api/v1/sizes`, size);
+}
