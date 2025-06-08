@@ -108,3 +108,35 @@ export interface IAddressUser {
     id: string
   };
 }
+
+export interface ICoupon {
+  id?: number;
+  code: string;
+  description?: string;
+  image?: string;
+  discountType: "PERCENT" | "AMOUNT";
+  discountValue: number;
+  maxDiscount?: number;
+  minOrderValue?: number;
+  quantity: number;
+  startDate?: string;
+  endDate?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface ITopping {
+  id?: number;
+  name: string;
+  image?: string;
+  description?: string;
+  price: number;
+  status?: "INACTIVE" | "ACTIVE" | "DELETED";
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
