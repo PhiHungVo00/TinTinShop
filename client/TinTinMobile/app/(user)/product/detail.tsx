@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'rea
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '@/util/constant';
-import { useOrders } from '@/context/OrderContext';
+import { useCart } from '@/context/CartContext';
 import Toast from 'react-native-toast-message';
 
 const DetailScreen = () => {
@@ -17,7 +17,7 @@ const DetailScreen = () => {
   const [selectedSugar, setSelectedSugar] = useState('vừa');
   const [totalPrice, setTotalPrice] = useState(parseFloat(product.price.replace('.', '')) || 0);
 
-  const { addOrder } = useOrders();
+  const { addItem } = useCart();
 
   const sizePrices: { [key: string]: number } = {
     S: 25000,
@@ -41,33 +41,25 @@ const DetailScreen = () => {
   }, [quantity, selectedSize, selectedToppings]);
 
   const handleAddToCart = () => {
-    console.log('Adding to cart:', { product, quantity, selectedSize, selectedToppings, selectedIce, selectedSugar, totalPrice });
-    
     let calculatedToppingPrice = 0;
     selectedToppings.forEach(topping => {
       calculatedToppingPrice += toppingPrices[topping];
     });
 
-    const newOrder = {
-      id: Date.now().toString(), // Unique ID for the order
-      date: new Date().toLocaleDateString('vi-VN'),
-      status: 'Chưa thanh toán',
-      items: [
-        {
-          name: product.name,
-          quantity: quantity,
-          price: product.price,
-          size: selectedSize,
-          ice: selectedIce,
-          sugar: selectedSugar,
-          toppings: selectedToppings,
-          toppingPrice: calculatedToppingPrice,
-        },
-      ],
-      total: totalPrice.toLocaleString('vi-VN') + 'đ',
+    const cartItem = {
+      id: Date.now().toString(),
+      name: product.name,
+      quantity: quantity,
+      price: product.price,
+      size: selectedSize,
+      ice: selectedIce,
+      sugar: selectedSugar,
+      toppings: selectedToppings,
+      toppingPrice: calculatedToppingPrice,
     };
-    addOrder(newOrder);
-    // Show success toast message
+
+    addItem(cartItem);
+    
     Toast.show({
       type: 'success',
       text1: 'Thêm vào giỏ hàng thành công!',
@@ -80,8 +72,6 @@ const DetailScreen = () => {
     setSelectedToppings([]);
     setSelectedIce('vừa');
     setSelectedSugar('vừa');
-    // The totalPrice will be re-calculated by useEffect
-    // router.back();
   };
 
   return (
