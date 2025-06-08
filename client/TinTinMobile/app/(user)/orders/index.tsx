@@ -2,39 +2,57 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { useState, useCallback } from 'react';
+import { useOrders } from '@/context/OrderContext';
 
-const orders = [
-  {
-    id: '1',
-    date: '20/03/2024',
-    status: 'Đã hoàn thành',
-    items: [
-      { name: 'Cà phê sữa', quantity: 2, price: '25.000đ' },
-      { name: 'Trà sữa trân châu', quantity: 1, price: '30.000đ' },
-    ],
-    total: '80.000đ',
-  },
-  {
-    id: '2',
-    date: '19/03/2024',
-    status: 'Chưa thanh toán',
-    items: [
-      { name: 'Trà đào', quantity: 1, price: '35.000đ' },
-    ],
-    total: '35.000đ',
-  },
-];
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: string;
+    size: string;
+    ice: string;
+    sugar: string;
+    toppings: Array<string>;
+    toppingPrice: number;
+  }>;
+  total: string;
+}
 
 export default function OrdersScreen() {
-    // Function to handle payment button press
-    const handlePaymentPress = (orderId: string) => {
-        // In a real app, you would pass the orderId to the payment screen
-        console.log(`Payment button pressed for order: ${orderId}`);
-        router.push('/(user)/payment'); // Navigate to payment screen
-    };
+  const { orders, updateOrderStatus } = useOrders();
 
-    return (
+  console.log('Current orders in OrdersScreen:', orders);
+
+  // Refresh orders when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      // TODO: Fetch orders from API
+      // const fetchOrders = async () => {
+      //   const response = await callGetOrders();
+      //   setOrders(response.data);
+      // };
+      // fetchOrders();
+    }, [])
+  );
+
+  const handlePaymentPress = (orderId: string) => {
+    const orderToPay = orders.find(order => order.id === orderId);
+    if (orderToPay) {
+      router.push({
+        pathname: '/(user)/payment',
+        params: { orderId, total: orderToPay.total }
+      });
+      // Simulate successful payment after navigation (for demonstration)
+      updateOrderStatus(orderId, 'Đã hoàn thành');
+    }
+  };
+
+  return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Đơn hàng của tôi</Text>
@@ -46,12 +64,12 @@ export default function OrdersScreen() {
               <TouchableOpacity key={order.id} style={styles.orderCard}>
                 <View style={styles.orderHeader}>
                   <Text style={styles.orderId}>Đơn hàng #{order.id}</Text>
-                  <Text style={[
+                  {/* <Text style={[
                     styles.orderStatus,
-                    { color: order.status === 'Đã hoàn thành' ? 'green' : COLORS.PRIMARY }
+                    { color: order.status === 'Đã hoàn thành' ? COLORS.SUCCESS : COLORS.PRIMARY }
                   ]}>
                     {order.status}
-                  </Text>
+                  </Text> */}
                 </View>
                 <View style={styles.orderDate}>
                   <AntDesign name="calendar" size={16} color={COLORS.ITEM_TEXT} />
@@ -62,6 +80,14 @@ export default function OrdersScreen() {
                     <View key={index} style={styles.orderItem}>
                       <Text style={styles.itemName}>{item.name} x{item.quantity}</Text>
                       <Text style={styles.itemPrice}>{item.price}</Text>
+                      <View style={styles.itemDetails}>
+                        <Text style={styles.itemDetailText}>Size: {item.size}</Text>
+                        <Text style={styles.itemDetailText}>Đá: {item.ice}</Text>
+                        <Text style={styles.itemDetailText}>Đường: {item.sugar}</Text>
+                        {item.toppings.length > 0 && (
+                          <Text style={styles.itemDetailText}>Topping: {item.toppings.join(', ')} ({item.toppingPrice.toLocaleString('vi-VN')} VNĐ)</Text>
+                        )}
+                      </View>
                     </View>
                   ))}
                 </View>
@@ -69,14 +95,19 @@ export default function OrdersScreen() {
                   <Text style={styles.totalLabel}>Tổng cộng:</Text>
                   <Text style={styles.totalAmount}>{order.total}</Text>
                 </View>
-               {order.status === 'Chưa thanh toán' && (
-                 <TouchableOpacity 
+                {order.status === 'Chưa thanh toán' ? (
+                  <TouchableOpacity 
                     style={styles.paymentButton}
                     onPress={() => handlePaymentPress(order.id)}
-                 >
-                   <Text style={styles.paymentButtonText}>Thanh toán</Text>
-                 </TouchableOpacity>
-               )}
+                  >
+                    <Text style={styles.paymentButtonText}>Thanh toán</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View style={styles.paymentSuccessContainer}>
+                    <AntDesign name="checkcircleo" size={20} color={COLORS.SUCCESS} />
+                    <Text style={styles.paymentSuccessText}>Thanh toán thành công</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -154,14 +185,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
+    flexWrap: 'wrap',
   },
   itemName: {
     fontSize: 14,
     color: COLORS.TEXT,
+    flexShrink: 1,
   },
   itemPrice: {
     fontSize: 14,
     color: COLORS.ITEM_TEXT,
+  },
+  itemDetails: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    width: '100%',
+    marginTop: 4,
+  },
+  itemDetailText: {
+    marginLeft: 0,
+    color: COLORS.ITEM_TEXT,
+    fontSize: 12,
   },
   orderTotal: {
     flexDirection: 'row',
@@ -203,5 +247,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.ITEM_TEXT,
     marginTop: 16,
+  },
+  paymentSuccessContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  paymentSuccessText: {
+    marginLeft: 8,
+    color: COLORS.SUCCESS,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

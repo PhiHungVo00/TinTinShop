@@ -43,6 +43,10 @@ const UserLayout = () => {
                 headerShown: false,
                 href: null,
             }} />
+            <Tabs.Screen name="product/detail" options={{
+                headerShown: false,
+                href: null,
+            }} />
         </Tabs>
     )
 }

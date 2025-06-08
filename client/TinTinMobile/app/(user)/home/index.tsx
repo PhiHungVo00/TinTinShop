@@ -4,8 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { useState, useMemo } from 'react';
+import { router } from 'expo-router';
+import { useFavorites } from '@/context/FavoritesContext';
 
-const allProducts = [
+export const allProducts = [
   // Cà phê
   { id: 1, name: 'Cà phê nóng', subtitle: 'Cà phê nguyên chất', image: require('@/assets/Food/Hotcoffee.jpg'), price: '25.000', rating: 4.5, category: 'Cà phê' },
   { id: 2, name: 'Cà phê đá', subtitle: 'Cà phê thêm đá', image: require('@/assets/Food/Coffee.jpg'), price: '25.000', rating: 4.2, category: 'Cà phê' },
@@ -53,7 +55,7 @@ const categories = ['All', 'Cà phê', 'Trà', 'Trà sữa', 'Sinh tố', 'Nư�
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchText, setSearchText] = useState('');
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const { favorites, toggleFavorite } = useFavorites();
 
   const filteredProducts = useMemo(() => {
     if (activeCategory === 'All') {
@@ -61,14 +63,6 @@ export default function HomeScreen() {
     }
     return allProducts.filter(product => product.category === activeCategory);
   }, [activeCategory]);
-
-  const toggleFavorite = (id: number) => {
-    setFavorites(prev => 
-      prev.includes(id) 
-        ? prev.filter(itemId => itemId !== id)
-        : [...prev, id]
-    );
-  };
 
   const renderProductItem = ({ item }: { item: typeof allProducts[0] }) => (
     <TouchableOpacity style={styles.productCard}>
@@ -88,7 +82,10 @@ export default function HomeScreen() {
         <Text style={styles.productSubtitle}>{item.subtitle}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.productPrice}>{item.price} VNĐ</Text>
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => router.push({ pathname: "/product/detail", params: { product: JSON.stringify(item) } })}
+          >
             <AntDesign name="plus" size={16} color="white" />
           </TouchableOpacity>
         </View>

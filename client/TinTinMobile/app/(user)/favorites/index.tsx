@@ -2,18 +2,22 @@ import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, FlatList }
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
-const favoriteProducts = [
-  { id: 1, name: 'Cà phê sữa', subtitle: 'Cà phê sữa đá', image: require('@/assets/Food/Coffeemilk.jpg'), price: '25.000' },
-  { id: 2, name: 'Trà sữa trân châu', subtitle: 'Trà sữa', image: require('@/assets/Food/Tranchauden.jpg'), price: '25.000' },
-  { id: 3, name: 'Trà đào', subtitle: 'Trà trái cây', image: require('@/assets/Food/Dao.jpg'), price: '25.000' },
-];
+import { useFavorites } from '@/context/FavoritesContext';
+import { allProducts } from '@/app/(user)/home';
+import { router } from 'expo-router';
 
 export default function FavoritesScreen() {
-  const renderProduct = ({ item }: { item: any }) => (
+  const { favorites, toggleFavorite } = useFavorites();
+
+  const favoriteProductsData = allProducts.filter(product => favorites.includes(product.id));
+
+  const renderProduct = ({ item }: { item: typeof allProducts[0] }) => (
     <TouchableOpacity style={styles.productCard}>
       <Image source={item.image} style={styles.productImage} />
-      <TouchableOpacity style={styles.favoriteButton}>
+      <TouchableOpacity 
+        style={styles.favoriteButton}
+        onPress={() => toggleFavorite(item.id)}
+      >
         <AntDesign name="heart" size={16} color="#FF0000" />
       </TouchableOpacity>
       <View style={styles.productInfo}>
@@ -21,7 +25,10 @@ export default function FavoritesScreen() {
         <Text style={styles.productSubtitle}>{item.subtitle}</Text>
         <View style={styles.priceRow}>
           <Text style={styles.productPrice}>{item.price} VNĐ</Text>
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => router.push({ pathname: "/product/detail", params: { product: JSON.stringify(item) } })}
+          >
             <AntDesign name="plus" size={16} color="white" />
           </TouchableOpacity>
         </View>
@@ -34,9 +41,9 @@ export default function FavoritesScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>TINTIN-Yêu thích</Text>
       </View>
-      {favoriteProducts.length > 0 ? (
+      {favoriteProductsData.length > 0 ? (
         <FlatList
-          data={favoriteProducts}
+          data={favoriteProductsData}
           renderItem={renderProduct}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}

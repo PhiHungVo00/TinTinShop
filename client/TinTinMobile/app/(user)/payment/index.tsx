@@ -1,106 +1,145 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import { AntDesign } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import Toast from "react-native-toast-message";
 
 const PaymentScreen = () => {
-  const totalAmount = '35.000'; 
-  const walletBalance = '18.000'; 
+  const { orderId, total } = useLocalSearchParams();
+  const totalAmount = total; 
+  const walletBalance = '1.000.000'; 
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handlePayment = async (method: string) => {
+    try {
+      setIsProcessing(true);
+      // TODO: Gọi API thanh toán ở đây
+      // const response = await callPaymentAPI(orderId, method);
+      // Giả lập delay để hiển thị loading
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      Toast.show({
+        type: 'success',
+        text1: `Thanh toán thành công qua ${method}`,
+      });
+
+      // Chuyển hướng về trang orders sau khi thanh toán thành công
+      router.replace('/(user)/orders');
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Thanh toán thất bại',
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <AntDesign name="left" size={24} color={COLORS.TEXT} />
+        <TouchableOpacity onPress={() => router.back()}>
+          <AntDesign name="arrowleft" size={24} color={COLORS.ITEM_TEXT} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Thanh toán</Text>
-        <View style={{ width: 24 }} />{/* Placeholder for spacing */}
+        <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Credit Card Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Thẻ tín dụng</Text>
-          <View style={styles.creditCard}>
-            <Image 
-              source={require('@/assets/images/store/chip.png')}
-              style={styles.chipIcon}
-            />
-            <Image 
-              source={require('@/assets/images/store/visa.png')}
-              style={styles.visaLogo}
-            />
-            <Text style={styles.cardNumber}>3897   8923   6745   4638</Text>
-            <View style={styles.cardDetailsRow}>
-              <View>
-                <Text style={styles.cardLabel}>Card Holder Name</Text>
-                <Text style={styles.cardValue}>Do Hoang Hieu</Text>
+      <ScrollView style={styles.content}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Phương thức thanh toán</Text>
+          <TouchableOpacity 
+            style={[styles.paymentMethod, isProcessing && styles.disabledMethod]} 
+            onPress={() => handlePayment('Ví điện tử')}
+            disabled={isProcessing}
+          >
+            <View style={styles.methodLeft}>
+              <View style={styles.iconContainer}>
+                <AntDesign name="wallet" size={24} color={COLORS.ITEM_TEXT} />
               </View>
               <View>
-                <Text style={styles.cardLabel}>Expiry Date</Text>
-                <Text style={styles.cardValue}>02/30</Text>
+                <Text style={styles.methodTitle}>Wallet</Text>
+                <Text style={styles.methodSubtitle}>Số dư: {walletBalance} VNĐ</Text>
               </View>
             </View>
+            <AntDesign name="checkcircle" size={24} color={COLORS.PRIMARY} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.paymentMethod, isProcessing && styles.disabledMethod]} 
+            onPress={() => handlePayment('Google Pay')}
+            disabled={isProcessing}
+          >
+            <View style={styles.methodLeft}>
+              <View style={styles.iconContainer}>
+                <AntDesign name="google" size={24} color={COLORS.ITEM_TEXT} />
+              </View>
+              <Text style={styles.methodTitle}>Google Pay</Text>
+            </View>
+            <AntDesign name="checkcircle" size={24} color={COLORS.PRIMARY} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.paymentMethod, isProcessing && styles.disabledMethod]} 
+            onPress={() => handlePayment('Apple Pay')}
+            disabled={isProcessing}
+          >
+            <View style={styles.methodLeft}>
+              <View style={styles.iconContainer}>
+                <AntDesign name="apple1" size={24} color={COLORS.ITEM_TEXT} />
+              </View>
+              <Text style={styles.methodTitle}>Apple Pay</Text>
+            </View>
+            <AntDesign name="checkcircle" size={24} color={COLORS.PRIMARY} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.paymentMethod, isProcessing && styles.disabledMethod]} 
+            onPress={() => handlePayment('Amazon Pay')}
+            disabled={isProcessing}
+          >
+            <View style={styles.methodLeft}>
+              <View style={styles.iconContainer}>
+                <AntDesign name="amazon" size={24} color={COLORS.ITEM_TEXT} />
+              </View>
+              <Text style={styles.methodTitle}>Amazon Pay</Text>
+            </View>
+            <AntDesign name="checkcircle" size={24} color={COLORS.PRIMARY} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.paymentMethod, isProcessing && styles.disabledMethod]} 
+            onPress={() => handlePayment('Thẻ tín dụng')}
+            disabled={isProcessing}
+          >
+            <View style={styles.methodLeft}>
+              <View style={styles.iconContainer}>
+                <AntDesign name="creditcard" size={24} color={COLORS.ITEM_TEXT} />
+              </View>
+              <Text style={styles.methodTitle}>Thẻ tín dụng</Text>
+            </View>
+            <AntDesign name="checkcircle" size={24} color={COLORS.PRIMARY} />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Chi tiết thanh toán</Text>
+          <View style={styles.paymentDetail}>
+            <Text style={styles.detailLabel}>Tổng tiền hàng</Text>
+            <Text style={styles.detailValue}>{totalAmount} VNĐ</Text>
+          </View>
+          <View style={styles.paymentDetail}>
+            <Text style={styles.detailLabel}>Phí vận chuyển</Text>
+            <Text style={styles.detailValue}>0 VNĐ</Text>
+          </View>
+          <View style={styles.paymentDetail}>
+            <Text style={styles.detailLabel}>Tổng thanh toán</Text>
+            <Text style={styles.totalAmount}>{totalAmount} VNĐ</Text>
           </View>
         </View>
-
-        {/* Other Payment Options */}
-        <View style={styles.sectionContainer}>
-          <TouchableOpacity style={styles.paymentOptionButton}>
-            <View style={styles.paymentOptionLeft}>
-              <Image 
-                source={require('@/assets/images/store/wallet.png')}
-                style={styles.paymentOptionIcon}
-              />
-              <Text style={styles.paymentOptionText}>Wallet</Text>
-            </View>
-            <Text style={styles.paymentOptionValue}>{walletBalance} VNĐ</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.paymentOptionButton}>
-            <View style={styles.paymentOptionLeft}>
-              <Image 
-                source={require('@/assets/images/store/googlepay.png')}
-                style={styles.paymentOptionIcon}
-              />
-              <Text style={styles.paymentOptionText}>Google Pay</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.paymentOptionButton}>
-            <View style={styles.paymentOptionLeft}>
-              <Image 
-                source={require('@/assets/images/store/applepay.png')}
-                style={styles.paymentOptionIcon}
-              />
-              <Text style={styles.paymentOptionText}>Apple Pay</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.paymentOptionButton}>
-            <View style={styles.paymentOptionLeft}>
-              <Image 
-                source={require('@/assets/images/store/amazonpay.png')}
-                style={styles.paymentOptionIcon}
-              />
-              <Text style={styles.paymentOptionText}>Amazon Pay</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
-
-      {/* Footer - Total and Pay Button */}
-      <View style={styles.footer}>
-        <View>
-          <Text style={styles.totalLabel}>Giá</Text>
-          <Text style={styles.totalAmount}>{totalAmount} VNĐ</Text>
-        </View>
-        <TouchableOpacity style={styles.payButton}>
-          <Text style={styles.payButtonText}>Thanh toán bằng thẻ</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };
@@ -115,68 +154,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-  },
-  backButton: {
-    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.ITEM_BORDER,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.TEXT,
   },
-  scrollView: {
+  content: {
     flex: 1,
-    paddingHorizontal: 16,
+    padding: 16,
   },
-  sectionContainer: {
+  section: {
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.TEXT,
     marginBottom: 12,
   },
-  creditCard: {
-    backgroundColor: COLORS.ITEM_BACKGROUND,
-    borderRadius: 12,
-    padding: 20,
-    borderColor: 'orange',
-    borderWidth: 1,
-  },
-  chipIcon: {
-    width: 40,
-    height: 30,
-    marginBottom: 20,
-  },
-  visaLogo: {
-    width: 50,
-    height: 20,
-    position: 'absolute',
-    top: 25,
-    right: 20,
-  },
-  cardNumber: {
-    fontSize: 18,
-    color: COLORS.TEXT,
-    marginBottom: 20,
-    letterSpacing: 2,
-  },
-  cardDetailsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cardLabel: {
-    fontSize: 12,
-    color: COLORS.ITEM_TEXT,
-    marginBottom: 4,
-  },
-  cardValue: {
-    fontSize: 14,
-    color: COLORS.TEXT,
-    fontWeight: 'bold',
-  },
-  paymentOptionButton: {
+  paymentMethod: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -185,53 +184,50 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
   },
-  paymentOptionLeft: {
+  disabledMethod: {
+    opacity: 0.5,
+  },
+  methodLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  paymentOptionIcon: {
-      width: 24,
-      height: 24,
-      marginRight: 12,
+  iconContainer: {
+    backgroundColor: COLORS.ITEM_BACKGROUND,
+    borderRadius: 12,
+    padding: 8,
+    marginRight: 12,
   },
-  paymentOptionText: {
-    fontSize: 16,
-    color: COLORS.TEXT,
-    marginLeft: 12,
-  },
-  paymentOptionValue: {
+  methodTitle: {
     fontSize: 16,
     color: COLORS.TEXT,
     fontWeight: 'bold',
   },
-  footer: {
+  methodSubtitle: {
+    fontSize: 14,
+    color: COLORS.ITEM_TEXT,
+  },
+  paymentDetail: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 9,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.ITEM_BACKGROUND,
+    padding: 12,
+    backgroundColor: COLORS.ITEM_BACKGROUND,
+    borderRadius: 12,
+    marginBottom: 12,
   },
-  totalLabel: {
+  detailLabel: {
     fontSize: 14,
     color: COLORS.ITEM_TEXT,
+  },
+  detailValue: {
+    fontSize: 16,
+    color: COLORS.TEXT,
+    fontWeight: 'bold',
   },
   totalAmount: {
     fontSize: 15,
     fontWeight: 'bold',
     color: COLORS.PRIMARY,
-    paddingBottom: 2,
-  },
-  payButton: {
-    backgroundColor: 'orange',
-    borderRadius: 13,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  payButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
