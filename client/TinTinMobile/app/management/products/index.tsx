@@ -390,7 +390,7 @@ const ProductManagement: React.FC = () => {
         title="Quản lý sản phẩm"
         backPress={() => router.back()}
         addPress={navigateToCreateProduct}
-        containerStyle={{marginTop: 20}}
+        containerStyle={{marginTop: 30}}
       />
       
       {Object.keys(groupedProducts).length > 0 ? (

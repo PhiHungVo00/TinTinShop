@@ -224,7 +224,11 @@ export const callGetProductSizesByProductId = (id: string) => {
 };
 
 export const callUpdateProductSize = (id: string, productSizeReq: IProductSizeReq) => {
-    return axios.put<IBackendRes<IProductSizeRes>>(`/api/v1/products/${id}/variants`, productSizeReq);
+    return axios.put<IBackendRes<IProductSizeRes>>(`/api/v1/variants/${id}`, productSizeReq);
+}
+
+export const callDeleteProductSize = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/variants/${id}`);
 }
 
 /**

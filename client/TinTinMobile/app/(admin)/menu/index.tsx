@@ -129,7 +129,7 @@ const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
             image={`${image_url_base}/product/${item.image}`}
             status={item.active}
             type="product"
-            onPress={() => navigation.navigate('ProductDetail', { productId: item.id })}
+            onPress={() => router.push({ pathname: "/management/products/ProductDetail", params: { id: item.id } })}
         />
     );
 
