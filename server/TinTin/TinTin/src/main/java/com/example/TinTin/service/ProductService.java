@@ -4,6 +4,7 @@ import com.example.TinTin.domain.Product;
 import com.example.TinTin.domain.response.product.ProductResponseDto;
 import com.example.TinTin.repository.CategoryRepository;
 import com.example.TinTin.repository.ProductRepository;
+import com.example.TinTin.repository.RatingRepository;
 import com.example.TinTin.util.error.DuplicateResourceException;
 import com.example.TinTin.util.error.IdInvalidException;
 import com.example.TinTin.util.mapper.ProductMapper;
@@ -17,10 +18,12 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final RatingRepository ratingRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, RatingRepository ratingRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     private Product validateAndSetCategory(Product product) {
@@ -49,14 +52,19 @@ public class ProductService {
         product.setActive(true);
 
         Product savedProduct = productRepository.save(product);
-
-        return ProductMapper.toProductResponseDto(savedProduct);
+        ProductResponseDto dto = ProductMapper.toProductResponseDto(savedProduct);
+        Double avg = ratingRepository.findAverageScoreByProductId(savedProduct.getId());
+        dto.setAverageRating(avg != null ? avg : 0);
+        return dto;
     }
 
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Product not found with id: " + id));
-        return ProductMapper.toProductResponseDto(product);
+        ProductResponseDto dto = ProductMapper.toProductResponseDto(product);
+        Double avg = ratingRepository.findAverageScoreByProductId(product.getId());
+        dto.setAverageRating(avg != null ? avg : 0);
+        return dto;
     }
 
     public ProductResponseDto updateProduct(Product product) {
@@ -79,8 +87,10 @@ public class ProductService {
         existingProduct.setCategory(product.getCategory());
 
         Product savedProduct = productRepository.save(existingProduct);
-
-        return ProductMapper.toProductResponseDto(savedProduct);
+        ProductResponseDto dto = ProductMapper.toProductResponseDto(savedProduct);
+        Double avg = ratingRepository.findAverageScoreByProductId(savedProduct.getId());
+        dto.setAverageRating(avg != null ? avg : 0);
+        return dto;
     }
 
     public void deleteProduct(Long id) {
@@ -96,7 +106,12 @@ public class ProductService {
     public List<ProductResponseDto> getAllProducts(Specification<Product> spec) {
         List<Product> products = productRepository.findAll(spec);
         return products.stream()
-                .map(ProductMapper::toProductResponseDto)
+                .map(p -> {
+                    ProductResponseDto dto = ProductMapper.toProductResponseDto(p);
+                    Double avg = ratingRepository.findAverageScoreByProductId(p.getId());
+                    dto.setAverageRating(avg != null ? avg : 0);
+                    return dto;
+                })
                 .toList();
 
     }

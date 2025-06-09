@@ -9,6 +9,7 @@ export interface IProduct {
     updatedAt: string;
     createdBy: string;
     updatedBy: string;
+    averageRating?: number;
 
 
 }
@@ -22,6 +23,7 @@ export interface IProductResponseDTO{
     updatedAt: string;
     createdBy: string;
     updatedBy: string;
+    averageRating?: number;
     category: {
         id: string;
         name: string;

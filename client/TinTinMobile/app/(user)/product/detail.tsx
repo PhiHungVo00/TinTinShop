@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '@/util/constant';
 import { useCart } from '@/context/CartContext';
+import { useAppContext } from '@/context/AppContext';
+import { callCreateRating } from '@/config/api';
 import Toast from 'react-native-toast-message';
 
 const DetailScreen = () => {
@@ -16,8 +18,11 @@ const DetailScreen = () => {
   const [selectedIce, setSelectedIce] = useState('vừa');
   const [selectedSugar, setSelectedSugar] = useState('vừa');
   const [totalPrice, setTotalPrice] = useState(parseFloat(product.price.replace('.', '')) || 0);
+  const [comment, setComment] = useState('');
+  const [score, setScore] = useState(5);
 
   const { addItem } = useCart();
+  const { user } = useAppContext();
 
   const sizePrices: { [key: string]: number } = {
     S: 25000,
@@ -74,6 +79,23 @@ const DetailScreen = () => {
     setSelectedSugar('vừa');
   };
 
+  const handleSubmitRating = async () => {
+    if (!user?.user.id) return;
+    try {
+      await callCreateRating({
+        productId: String(product.id),
+        userId: String(user.user.id),
+        score,
+        comment,
+      });
+      Toast.show({ type: 'success', text1: 'Đã gửi đánh giá' });
+      setComment('');
+      setScore(5);
+    } catch (e) {
+      Toast.show({ type: 'error', text1: 'Gửi đánh giá thất bại' });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -85,7 +107,7 @@ const DetailScreen = () => {
           <Image source={product.image} style={styles.productImage} />
           <View style={styles.productInfo}>
             <Text style={styles.productName}>{product.name}</Text>
-            <Text style={styles.productRating}>{product.rating} K đã bán</Text>
+            <Text style={styles.productRating}>{(product.averageRating || 0).toFixed(1)} ★</Text>
             <Text style={styles.productLikes}>4 K đã thích</Text>
             <View style={styles.quantityControl}>
               <TouchableOpacity onPress={() => setQuantity(prev => Math.max(1, prev - 1))}>
@@ -175,6 +197,26 @@ const DetailScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Đánh giá sản phẩm</Text>
+          <TextInput
+            placeholder="Nội dung"
+            value={comment}
+            onChangeText={setComment}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="Điểm (1-5)"
+            value={score.toString()}
+            onChangeText={text => setScore(Number(text))}
+            keyboardType="numeric"
+            style={styles.input}
+          />
+          <TouchableOpacity style={styles.addToCartButton} onPress={handleSubmitRating}>
+            <Text style={styles.addToCartButtonText}>Gửi đánh giá</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -316,6 +358,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: 'white',
+  },
+  input: {
+    backgroundColor: COLORS.ITEM_BACKGROUND,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    color: COLORS.TEXT,
   },
   optionGroup: {
     flexDirection: 'row',

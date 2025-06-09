@@ -89,7 +89,7 @@ export default function HomeScreen() {
             subtitle: p.description || '',
             image: { uri: `${image_url_base}/product/${p.image}` },
             price: '0',
-            rating: 0,
+            rating: p.averageRating || 0,
             category: p.category?.name || '',
           }));
           setProducts(mapped);

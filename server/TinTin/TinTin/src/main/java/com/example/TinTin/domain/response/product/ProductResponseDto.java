@@ -24,6 +24,7 @@ public class ProductResponseDto {
     private Instant updatedAt;
     private String createdBy;
     private String updatedBy;
+    private Double averageRating;
     private CategoryDto category;
 
     @Getter

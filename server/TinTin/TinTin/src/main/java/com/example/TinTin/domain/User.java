@@ -14,6 +14,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.TinTin.domain.Rating;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -68,6 +70,10 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<FavoriteTopping> favoriteToppings;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Rating> ratings;
 
     @PrePersist
     public void preCreateUser(){

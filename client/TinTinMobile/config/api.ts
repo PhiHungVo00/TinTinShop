@@ -3,6 +3,7 @@ import axios from "./axios-customize"
 import { IProduct, IProductResponseDTO } from "@/types/product"
 import { IProductSizeReq, IProductSizeRes } from "@/types/productSize"
 import { IProductFavoriteReq, IProductFavoriteRes, IToppingFavoriteReq, IToppingFavoriteRes } from "@/types/favorite"
+import { IRatingReq, IRatingRes } from "@/types/rating"
 import { IOrderReq, IOrderRes, IOrderUpdate } from "@/types/order"
 import { IOrderDetailRes } from "@/types/orderDetail"
 
@@ -331,6 +332,18 @@ export const callGetToppingFavoritesOfUser = (id: string) => {
 export const callDeleteToppingFavorite = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/favorite/toppings/${id}`);
 }
+
+/**
+ * Module rating
+ */
+export const callCreateRating = (ratingReq: IRatingReq) => {
+    return axios.post<IBackendRes<IRatingRes>>(`/api/v1/ratings`, ratingReq);
+};
+
+export const callGetRatingsByProduct = (id: string) => {
+    return axios.get<IBackendRes<IRatingRes[]>>(`/api/v1/ratings/products/${id}`);
+};
+
 
 /**
  * 

@@ -12,6 +12,8 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.List;
 
+import com.example.TinTin.domain.Rating;
+
 @Entity
 @Table(name = "products")
 @Setter
@@ -49,6 +51,10 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<FavoriteProduct> favoriteProducts;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Rating> ratings;
 
     @PrePersist
     public void preCreateProduct() {
