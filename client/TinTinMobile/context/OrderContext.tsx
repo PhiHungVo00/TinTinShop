@@ -23,6 +23,7 @@ interface OrderContextType {
   orders: Order[];
   addOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, newStatus: string) => void;
+  setOrdersList: (orders: Order[]) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -42,8 +43,12 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const setOrdersList = (orders: Order[]) => {
+    setOrders(orders);
+  };
+
   return (
-    <OrderContext.Provider value={{ orders, addOrder, updateOrderStatus }}>
+    <OrderContext.Provider value={{ orders, addOrder, updateOrderStatus, setOrdersList }}>
       {children}
     </OrderContext.Provider>
   );
