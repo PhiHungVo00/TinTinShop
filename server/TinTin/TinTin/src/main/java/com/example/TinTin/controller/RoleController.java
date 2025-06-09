@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,18 +27,21 @@ public class RoleController {
 
     @PostMapping("/roles")
     @ApiMessage("Create new role")
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
     public ResponseEntity<Role> createRole(@Valid @RequestBody Role role) throws BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.roleService.createRole(role));
     }
 
     @PutMapping("/roles")
     @ApiMessage("Update role")
+    @PreAuthorize("hasAuthority('ROLE_UPDATE')")
     public ResponseEntity<Role> updateRole(@Valid @RequestBody Role role) throws BadRequestException {
         return ResponseEntity.status(HttpStatus.OK).body(this.roleService.updateRole(role));
     }
 
     @GetMapping("/roles")
     @ApiMessage("Get roles with pagination")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public ResponseEntity<ResultPaginationDTO<List<Role>>> getAllRole(
             @Filter Specification<Role> spec,
             Pageable pageable
@@ -51,6 +55,7 @@ public class RoleController {
 
     @DeleteMapping("/roles/{id}")
     @ApiMessage("Delete a role")
+    @PreAuthorize("hasAuthority('ROLE_DELETE')")
     public ResponseEntity<Void> deleteRole(@PathVariable long id){
         this.roleService.deleteRole(id);
         return ResponseEntity.ok().body(null);

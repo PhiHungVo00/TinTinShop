@@ -20,6 +20,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -33,6 +35,17 @@ public class AuthController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userService = userService;
         this.securityUtil = securityUtil;
+    }
+
+    private List<String> extractAuthorities(User user){
+        List<String> authorities = new ArrayList<>();
+        if(user != null && user.getRole() != null){
+            authorities.add(user.getRole().getName());
+            if(user.getRole().getPermissions() != null){
+                user.getRole().getPermissions().forEach(p -> authorities.add(p.getName()));
+            }
+        }
+        return authorities;
     }
 
     @Value("${jwt.refresh-token.expiration}")
@@ -62,8 +75,9 @@ public class AuthController {
             resLoginDTO.setUser(userLogin);
         }
 
-        //Create token
-        String accessToken = this.securityUtil.createAccessToken(authentication.getName(), resLoginDTO);
+        //Create token with permissions
+        List<String> permissions = extractAuthorities(currentUserLogin);
+        String accessToken = this.securityUtil.createAccessToken(authentication.getName(), resLoginDTO, permissions);
         resLoginDTO.setAccessToken(accessToken);
 
         //Create refresh token
@@ -116,7 +130,8 @@ public class AuthController {
             resLoginDTO.setUser(userLogin);
         }
         //Create token
-        String accessToken = this.securityUtil.createAccessToken(email, resLoginDTO);
+        List<String> permissions = extractAuthorities(currentUserLogin);
+        String accessToken = this.securityUtil.createAccessToken(email, resLoginDTO, permissions);
         resLoginDTO.setAccessToken(accessToken);
 
         //Create refresh token
