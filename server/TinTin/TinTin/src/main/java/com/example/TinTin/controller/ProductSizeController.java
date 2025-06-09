@@ -49,6 +49,20 @@ public class ProductSizeController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/variants/{id}")
+    @ApiMessage("Delete a product size variant by ID")
+    public ResponseEntity<Void> deleteProductSizeVariant(@PathVariable("id") Long id) {
+        productSizeService.deleteProductSizeVariant(id);
+        return ResponseEntity.ok().body(null);
+    }
+
+    @GetMapping("/variants/{id}")
+    @ApiMessage("Get product size variant by ID")
+    public ResponseEntity<ProductSizeResponseDTO> getProductSizeVariant(@PathVariable("id") Long id) {
+        ProductSizeResponseDTO response = productSizeService.getProductSizeVariant(id);
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }

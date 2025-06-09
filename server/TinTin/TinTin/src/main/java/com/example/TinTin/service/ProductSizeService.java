@@ -8,6 +8,7 @@ import com.example.TinTin.domain.response.productSize.ProductSizeResponseDTO;
 import com.example.TinTin.repository.ProductRepository;
 import com.example.TinTin.repository.ProductSizeRepository;
 import com.example.TinTin.repository.SizeRepository;
+import com.example.TinTin.util.constrant.ProductSizeStatusEnum;
 import com.example.TinTin.util.error.BusinessException;
 import com.example.TinTin.util.error.IdInvalidException;
 import com.example.TinTin.util.mapper.ProductSizeMapper;
@@ -73,6 +74,12 @@ public class ProductSizeService {
                 .toList();
     }
 
+    public ProductSizeResponseDTO getProductSizeVariant(Long id) {
+        ProductSize existingVariant = productSizeRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("Product size variant not found with id: " + id));
+        return ProductSizeMapper.toResponseDTO(existingVariant);
+    }
+
     public ProductSizeResponseDTO updateProductSizeVariant(Long id, ProductSizeRequestDTO productSizeRequestDTO) {
         ProductSize existingVariant = productSizeRepository.findById(id)
                 .orElseThrow(() -> new IdInvalidException("Product size variant not found with id: " + id));
@@ -87,6 +94,16 @@ public class ProductSizeService {
         existingVariant.setStockQuantity(productSizeRequestDTO.getStockQuantity());
         existingVariant.setStatus(productSizeRequestDTO.getStatus());
         return ProductSizeMapper.toResponseDTO(productSizeRepository.save(existingVariant));
+    }
+
+    public void deleteProductSizeVariant(Long id) {
+        if (id == null) {
+            throw new IdInvalidException("Product size variant ID cannot be null");
+        }
+        ProductSize productSize = productSizeRepository.findById(id)
+                .orElseThrow(() -> new IdInvalidException("Product size variant not found with ID: " + id));
+        productSize.setStatus(ProductSizeStatusEnum.DELETED);
+        productSizeRepository.save(productSize);
     }
 
 
