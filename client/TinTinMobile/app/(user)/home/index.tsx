@@ -204,7 +204,7 @@ export default function HomeScreen() {
   };
 
   const filteredProducts = useMemo(() => {
-    let filtered = products;
+    let filtered = allProducts;
     
     // Filter by category
     if (activeCategory !== 'All') {
@@ -223,7 +223,7 @@ export default function HomeScreen() {
     return filtered;
   }, [activeCategory, searchText]);
 
-  const renderProductItem = ({ item }: { item: any }) => (
+  const renderProductItem = ({ item }: { item: typeof allProducts[0] }) => (
     <TouchableOpacity style={styles.productCard}>
       <Image source={item.image} style={styles.productImage} />
       <TouchableOpacity 
@@ -252,7 +252,7 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
-  const renderToppingItem = ({ item }: { item: any }) => (
+  const renderToppingItem = ({ item }: { item: typeof toppings[0] }) => (
     <TouchableOpacity style={styles.toppingCard}>
       <Image source={item.image} style={styles.toppingImage} />
       <TouchableOpacity 
@@ -277,7 +277,7 @@ export default function HomeScreen() {
     if (activeCategory === 'Topping') {
       return (
         <FlatList
-          data={toppingsData}
+          data={toppings}
           renderItem={renderToppingItem}
           keyExtractor={(item) => item.id.toString()}
           horizontal={false} 
@@ -473,7 +473,7 @@ export default function HomeScreen() {
           <>
             <Text style={styles.sectionTitle}>Topping kèm theo</Text>
             <FlatList
-              data={toppingsData}
+              data={toppings}
               renderItem={renderToppingItem}
               keyExtractor={(item) => item.id.toString()}
               horizontal
@@ -790,3 +790,4 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
+

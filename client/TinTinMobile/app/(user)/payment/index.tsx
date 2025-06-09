@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import Toast from "react-native-toast-message";
 import { useCart } from '@/context/CartContext';
 import { useOrders } from '@/context/OrderContext';
+import { IOrderRes } from '@/types/order';
 
 const PaymentScreen = () => {
   const { total } = useLocalSearchParams();
@@ -39,21 +40,31 @@ const PaymentScreen = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Tạo đơn hàng mới từ giỏ hàng
-      const newOrder = {
+      const newOrder: IOrderRes = {
         id: Date.now().toString(),
-        date: new Date().toLocaleDateString('vi-VN'),
+        userId: '1', // TODO: Get from user context
+        addressUser: {
+          id: '1', // TODO: Get from selected address
+          addressLine: '123 Street',
+          ward: 'Ward 1',
+          district: 'District 1',
+          province: 'HCM',
+          receiverName: 'John Doe',
+          receiverPhone: '0123456789',
+          defaultAddress: true
+        },
+        note: '',
+        totalPrice: parseFloat(totalAmount.toString()),
+        finalPrice: parseFloat(totalAmount.toString()),
         status: 'Đã hoàn thành',
-        items: items.map(item => ({
-          name: item.name,
+        createdAt: new Date().toISOString(),
+        orderDetails: items.map(item => ({
+          id: Date.now().toString(),
+          productSizeId: item.id,
           quantity: item.quantity,
-          price: item.price,
-          size: item.size,
-          ice: item.ice,
-          sugar: item.sugar,
-          toppings: item.toppings,
-          toppingPrice: item.toppingPrice,
-        })),
-        total: totalAmount.toString(),
+          price: parseFloat(item.price.replace(/[^\d]/g, '')),
+          toppingIds: item.toppings
+        }))
       };
 
       // Thêm đơn hàng mới và xóa giỏ hàng

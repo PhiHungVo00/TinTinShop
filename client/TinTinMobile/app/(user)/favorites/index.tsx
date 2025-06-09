@@ -1,16 +1,10 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFavorites } from '@/context/FavoritesContext';
-import { useAppContext } from '@/context/AppContext';
-import { callGetProducts, callGetToppings, callGetProductFavoritesOfUser, callGetToppingFavoritesOfUser } from '@/config/api';
-import { useFocusEffect } from 'expo-router';
-
-const IPV4 = process.env.EXPO_PUBLIC_IPV4;
-const PORT = process.env.EXPO_PUBLIC_PORT;
-const image_url_base = `http://${IPV4}:${PORT}/storage`;
+import { allProducts, toppings } from '@/app/(user)/home';
 import { router } from 'expo-router';
 
 interface Topping {
@@ -22,74 +16,24 @@ interface Topping {
 }
 
 export default function FavoritesScreen() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [toppingList, setToppingList] = useState<any[]>([]);
-  const { user } = useAppContext();
-  const {
-    favorites,
-    favoriteToppings,
-    toggleFavorite,
-    toggleFavoriteTopping,
-    setFavoritesList,
-    setFavoriteToppingsList,
-  } = useFavorites();
+  const { favorites, favoriteToppings, toggleFavorite, toggleFavoriteTopping } = useFavorites();
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const [prodRes, topRes] = await Promise.all([
-            callGetProducts({}),
-            callGetToppings({}),
-          ]);
+  // TODO: Gọi API lấy danh sách sản phẩm yêu thích
+  // const fetchFavoriteProducts = async () => {
+  //   const response = await callGetFavoriteProducts();
+  //   setFavoriteProducts(response.data);
+  // };
 
-          if (prodRes.data) {
-            const mapped = prodRes.data.map((p: any) => ({
-              id: Number(p.id),
-              name: p.name,
-              subtitle: p.description || '',
-              image: { uri: `${image_url_base}/product/${p.image}` },
-              price: '0',
-            }));
-            setProducts(mapped);
-          }
+  // TODO: Gọi API lấy danh sách topping yêu thích
+  // const fetchFavoriteToppings = async () => {
+  //   const response = await callGetFavoriteToppings();
+  //   setFavoriteToppings(response.data);
+  // };
 
-          if (topRes.data) {
-            const mappedT = topRes.data.map((t: any) => ({
-              id: Number(t.id),
-              name: t.name,
-              subtitle: t.description || '',
-              image: { uri: `${image_url_base}/topping/${t.image}` },
-              price: t.price?.toString() || '0',
-            }));
-            setToppingList(mappedT);
-          }
+  const favoriteProductsData = allProducts.filter(product => favorites.includes(product.id));
+  const favoriteToppingsData = toppings.filter((topping: Topping) => favoriteToppings.includes(topping.id));
 
-          if (user?.user.id) {
-            const [favProdRes, favTopRes] = await Promise.all([
-              callGetProductFavoritesOfUser(user.user.id),
-              callGetToppingFavoritesOfUser(user.user.id),
-            ]);
-
-            if (favProdRes.data) {
-              setFavoritesList(favProdRes.data.map((f: any) => Number(f.product.id)));
-            }
-            if (favTopRes.data) {
-              setFavoriteToppingsList(favTopRes.data.map((f: any) => Number(f.topping.id)));
-            }
-          }
-        } catch (error) {
-          console.error('Error fetching favorites data', error);
-        }
-      };
-      fetchData();
-    }, [user?.user.id])
-  );
-
-  const favoriteProductsData = products.filter(product => favorites.includes(product.id));
-  const favoriteToppingsData = toppingList.filter((topping: Topping) => favoriteToppings.includes(topping.id));
-
-  const renderProduct = ({ item }: { item: any }) => (
+  const renderProduct = ({ item }: { item: typeof allProducts[0] }) => (
     <TouchableOpacity style={styles.productCard}>
       <Image source={item.image} style={styles.productImage} />
       <TouchableOpacity 
@@ -124,7 +68,7 @@ export default function FavoritesScreen() {
     </TouchableOpacity>
   );
 
-  const renderTopping = ({ item }: { item: any }) => (
+  const renderTopping = ({ item }: { item: typeof toppings[0] }) => (
     <TouchableOpacity style={styles.toppingCard}>
       <Image source={item.image} style={styles.toppingImage} />
       <TouchableOpacity 

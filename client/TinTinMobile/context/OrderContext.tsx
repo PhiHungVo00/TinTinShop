@@ -1,37 +1,19 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface OrderItem {
-  name: string;
-  quantity: number;
-  price: string; // Base product price
-  size: string;
-  ice: string;
-  sugar: string;
-  toppings: string[];
-  toppingPrice: number; // Price for all selected toppings
-}
-
-interface Order {
-  id: string;
-  date: string;
-  status: string;
-  items: OrderItem[];
-  total: string;
-}
+import { IOrderRes } from '@/types/order';
 
 interface OrderContextType {
-  orders: Order[];
-  addOrder: (order: Order) => void;
+  orders: IOrderRes[];
+  addOrder: (order: IOrderRes) => void;
   updateOrderStatus: (orderId: string, newStatus: string) => void;
-  setOrdersList: (orders: Order[]) => void;
+  setOrdersList: (orders: IOrderRes[]) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<IOrderRes[]>([]);
 
-  const addOrder = (newOrder: Order) => {
+  const addOrder = (newOrder: IOrderRes) => {
     setOrders(prevOrders => [newOrder, ...prevOrders]);
   };
 
@@ -43,7 +25,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  const setOrdersList = (orders: Order[]) => {
+  const setOrdersList = (orders: IOrderRes[]) => {
     setOrders(orders);
   };
 

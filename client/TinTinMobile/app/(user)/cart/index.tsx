@@ -37,7 +37,7 @@ import { DiscountType } from '@/types/enums/DiscountType.enum';
 
 const discountData: ICoupon[] = [
   {
-    id: 1,
+    id: '1',
     code: 'TINTIN10',
     description: 'Giảm giá 10% cho đơn hàng',
     image: '',
@@ -51,7 +51,7 @@ const discountData: ICoupon[] = [
     isActive: true
   },
   {
-    id: 2,
+    id: '2',
     code: 'TINTIN20',
     description: 'Giảm giá 20% cho đơn hàng',
     image: '',
@@ -65,7 +65,7 @@ const discountData: ICoupon[] = [
     isActive: true
   },
   {
-    id: 3,
+    id: '3',
     code: 'TINTIN50K',
     description: 'Giảm giá 50.000 VNĐ cho đơn hàng',
     image: '',
@@ -301,7 +301,7 @@ const CartScreen = () => {
             </View>
             <FlatList
               data={discountData}
-              keyExtractor={(item) => item.id?.toString() || ''}
+              keyExtractor={(item) => item.id || ''}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.discountListItem}
