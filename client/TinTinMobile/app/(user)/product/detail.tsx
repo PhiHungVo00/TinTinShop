@@ -5,10 +5,11 @@ import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '@/util/constant';
 import { useCart } from '@/context/CartContext';
 import Toast from 'react-native-toast-message';
+import { IProduct, ICartItem } from '@/types/backend';
 
 const DetailScreen = () => {
   const params = useLocalSearchParams();
-  const product = JSON.parse(params.product as string);
+  const product: IProduct = JSON.parse(params.product as string);
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('S');
@@ -46,7 +47,7 @@ const DetailScreen = () => {
       calculatedToppingPrice += toppingPrices[topping];
     });
 
-    const cartItem = {
+    const cartItem: ICartItem = {
       id: Date.now().toString(),
       name: product.name,
       quantity: quantity,

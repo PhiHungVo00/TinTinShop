@@ -129,3 +129,53 @@ export interface ICoupon {
   
 
 }
+
+export interface IOrder {
+  id: string;
+  date: string;
+  status: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: string;
+    size: string;
+    ice: string;
+    sugar: string;
+    toppings: Array<string>;
+    toppingPrice: number;
+  }>;
+  total: string;
+}
+
+export interface IProduct {
+  id: string;
+  name: string;
+  price: string;
+  description?: string;
+  image?: string;
+  category?: string;
+  rating?: number;
+  likes?: number;
+}
+
+export interface ICartItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: string;
+  size: string;
+  ice: string;
+  sugar: string;
+  toppings: string[];
+  toppingPrice: number;
+}
+
+export interface IPayment {
+  id: string;
+  orderId: string;
+  method: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}

@@ -5,23 +5,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { router, useFocusEffect } from 'expo-router';
 import { useState, useCallback } from 'react';
 import { useOrders } from '@/context/OrderContext';
-
-interface Order {
-  id: string;
-  date: string;
-  status: string;
-  items: Array<{
-    name: string;
-    quantity: number;
-    price: string;
-    size: string;
-    ice: string;
-    sugar: string;
-    toppings: Array<string>;
-    toppingPrice: number;
-  }>;
-  total: string;
-}
+import { IOrder } from '@/types/backend';
 
 export default function OrdersScreen() {
   const { orders, updateOrderStatus } = useOrders();

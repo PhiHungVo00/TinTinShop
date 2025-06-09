@@ -450,22 +450,22 @@ export default function HomeScreen() {
       >
         {renderBanner()}
 
-        <View style={styles.categoriesContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category}
-                style={[styles.categoryButton, activeCategory === category && styles.activeCategoryButton]}
-                onPress={() => setActiveCategory(category)}
-              >
-                <Text style={[styles.categoryText, activeCategory === category && styles.activeCategoryText]}>
-                  {category}
-                </Text>
-                {activeCategory === category && <View style={styles.activeCategoryIndicator} />}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+      <View style={styles.categoriesContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
+              style={[styles.categoryButton, activeCategory === category && styles.activeCategoryButton]}
+              onPress={() => setActiveCategory(category)}
+            >
+              <Text style={[styles.categoryText, activeCategory === category && styles.activeCategoryText]}>
+                {category}
+              </Text>
+              {activeCategory === category && <View style={styles.activeCategoryIndicator} />}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
         {renderContent()}
 

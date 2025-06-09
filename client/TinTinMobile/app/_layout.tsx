@@ -43,11 +43,11 @@ export default function RootLayout() {
             <OrderProvider>
               <CartProvider>
                 <DiscountProvider>
-                  <StatusBar hidden />
-                  <Stack screenOptions={{ headerShown: false }} />
-                  <WithLoadingHandler />
-                  <LoadingModal />
-                  <Toast config={toastConfig} />
+                <StatusBar hidden />
+                <Stack screenOptions={{ headerShown: false }} />
+                <WithLoadingHandler />
+                <LoadingModal />
+                <Toast config={toastConfig} />
                 </DiscountProvider>
               </CartProvider>
             </OrderProvider>

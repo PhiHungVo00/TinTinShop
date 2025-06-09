@@ -32,7 +32,7 @@ import { useDiscount } from '@/context/DiscountContext';
 import Toast from 'react-native-toast-message';
 import { useAppContext } from '@/context/AppContext';
 import { callGetUser, getAllAddressOfUser, createAddress } from '@/config/api';
-import { IUser, IAddressUser, ICoupon } from '@/types/backend';
+import { IUser, IAddressUser, ICoupon, ICartItem } from '@/types/backend';
 import { DiscountType } from '@/types/enums/DiscountType.enum';
 
 const discountData: ICoupon[] = [
@@ -133,7 +133,7 @@ const CartScreen = () => {
                 phone: defaultAddress.receiverPhone,
                 address: `${defaultAddress.addressLine}, ${defaultAddress.ward}, ${defaultAddress.district}, ${defaultAddress.province}`,
               }));
-            }
+    }
           }
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -484,50 +484,50 @@ const CartScreen = () => {
       <ScrollView style={styles.content}>
         {items.length > 0 ? (
           <>
-            <View style={styles.itemsList}>
-              {items.map((item) => (
-                <View key={item.id} style={styles.cartItem}>
-                  <View style={styles.itemInfo}>
-                    <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemDetails}>
-                      Size: {item.size} | Đá: {item.ice} | Đường: {item.sugar}
+          <View style={styles.itemsList}>
+            {items.map((item) => (
+              <View key={item.id} style={styles.cartItem}>
+                <View style={styles.itemInfo}>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <Text style={styles.itemDetails}>
+                    Size: {item.size} | Đá: {item.ice} | Đường: {item.sugar}
+                  </Text>
+                  {item.toppings.length > 0 && (
+                    <Text style={styles.itemToppings}>
+                      Topping: {item.toppings.join(', ')}
                     </Text>
-                    {item.toppings.length > 0 && (
-                      <Text style={styles.itemToppings}>
-                        Topping: {item.toppings.join(', ')}
-                      </Text>
-                    )}
-                    <Text style={styles.itemPrice}>
-                      {parseFloat(item.price.replace(/[^\d]/g, '')) * item.quantity + (item.toppingPrice * item.quantity)} VNĐ
-                    </Text>
-                  </View>
+                  )}
+                  <Text style={styles.itemPrice}>
+                    {parseFloat(item.price.replace(/[^\d]/g, '')) * item.quantity + (item.toppingPrice * item.quantity)} VNĐ
+                  </Text>
+                </View>
 
-                  <View style={styles.itemActions}>
-                    <View style={styles.quantityControl}>
-                      <TouchableOpacity
-                        onPress={() => updateItemQuantity(item.id, Math.max(1, item.quantity - 1))}
-                        style={styles.quantityButton}
-                      >
-                        <AntDesign name="minus" size={16} color={COLORS.TEXT} />
-                      </TouchableOpacity>
-                      <Text style={styles.quantity}>{item.quantity}</Text>
-                      <TouchableOpacity
-                        onPress={() => updateItemQuantity(item.id, item.quantity + 1)}
-                        style={styles.quantityButton}
-                      >
-                        <AntDesign name="plus" size={16} color={COLORS.TEXT} />
-                      </TouchableOpacity>
-                    </View>
+                <View style={styles.itemActions}>
+                  <View style={styles.quantityControl}>
                     <TouchableOpacity
-                      onPress={() => removeItem(item.id)}
-                      style={styles.removeButton}
+                      onPress={() => updateItemQuantity(item.id, Math.max(1, item.quantity - 1))}
+                      style={styles.quantityButton}
                     >
-                      <AntDesign name="delete" size={20} color={COLORS.ERROR} />
+                      <AntDesign name="minus" size={16} color={COLORS.TEXT} />
+                    </TouchableOpacity>
+                    <Text style={styles.quantity}>{item.quantity}</Text>
+                    <TouchableOpacity
+                      onPress={() => updateItemQuantity(item.id, item.quantity + 1)}
+                      style={styles.quantityButton}
+                    >
+                      <AntDesign name="plus" size={16} color={COLORS.TEXT} />
                     </TouchableOpacity>
                   </View>
+                  <TouchableOpacity
+                    onPress={() => removeItem(item.id)}
+                    style={styles.removeButton}
+                  >
+                    <AntDesign name="delete" size={20} color={COLORS.ERROR} />
+                  </TouchableOpacity>
                 </View>
-              ))}
-            </View>
+              </View>
+            ))}
+          </View>
 
             {renderDeliverySection()}
 
@@ -609,7 +609,7 @@ const CartScreen = () => {
               {calculateTotal().finalTotal.toLocaleString('vi-VN')} VNĐ
             </Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.checkoutButton}
             onPress={handlePayment}
           >
