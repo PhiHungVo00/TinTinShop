@@ -22,15 +22,17 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Quan hệ nhiều đơn hàng - 1 người dùng
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Quan hệ nhiều đơn hàng - 1 coupon (nullable)
     @ManyToOne()
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
+
+    @ManyToOne()
+    @JoinColumn(name = "address_user_id", nullable = false)
+    private AddressUser addressUser;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String note;

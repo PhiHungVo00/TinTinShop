@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { router, useFocusEffect } from 'expo-router';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useOrders } from '@/context/OrderContext';
 import { IOrder } from '@/types/backend';
 
@@ -25,20 +25,34 @@ interface Order {
 }
 
 export default function OrdersScreen() {
-  const { orders, updateOrderStatus } = useOrders();
+  const { orders, updateOrderStatus, setOrdersList } = useOrders();
+  const { user } = useAppContext();
 
   console.log('Current orders in OrdersScreen:', orders);
 
   // Refresh orders when screen is focused
   useFocusEffect(
     useCallback(() => {
-      // TODO: Gọi API lấy danh sách đơn hàng của user
-      // const fetchOrders = async () => {
-      //   const response = await callGetOrders();
-      //   setOrders(response.data);
-      // };
-      // fetchOrders();
-    }, [])
+      const fetchOrders = async () => {
+        if (!user?.user.id) return;
+        try {
+          const res = await callGetOrders({ filter: `user.id:${user.user.id}` });
+          if (res.data) {
+            const mapped = res.data.map((o: any) => ({
+              id: o.id,
+              date: o.createdAt || '',
+              status: o.status,
+              items: o.orderDetails || [],
+              total: o.finalPrice?.toString() || '0',
+            }));
+            setOrdersList(mapped);
+          }
+        } catch (error) {
+          console.error('Error fetching orders', error);
+        }
+      };
+      fetchOrders();
+    }, [user?.user.id])
   );
 
   const handlePaymentPress = (orderId: string) => {

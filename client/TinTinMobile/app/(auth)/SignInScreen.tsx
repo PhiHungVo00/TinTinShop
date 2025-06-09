@@ -105,7 +105,7 @@ const SignInScreen = () => {
     } else {
       Toast.show({
         type: 'error',
-        text1: `Login failed ${res.message}`,
+        text1: `Tài khoản hoặc mật khẩu không chính xác`,
       });
     }
   }

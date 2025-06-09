@@ -1,4 +1,3 @@
-// components/CustomToast.tsx
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,10 +36,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   success: {
-    backgroundColor: "#28a745", // xanh lá cây
+    backgroundColor: "#28a745", 
   },
   error: {
-    backgroundColor: "#dc3545", // đỏ
+    backgroundColor: "#dc3545",
   },
   icon: {
     marginRight: 10,

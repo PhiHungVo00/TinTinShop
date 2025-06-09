@@ -1,11 +1,12 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Animated } from "react-native";
 import { COLORS } from "@/util/constant";
 import HeaderList from "@/components/HeaderList";
 import { router } from "expo-router";
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Octicons from '@expo/vector-icons/Octicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import ShareTextInput from "@/components/ShareTextInput";
 import ItemUser from "@/components/ItemUser";
 import { callDeleteUser, callGetUsers } from "@/config/api";
@@ -14,6 +15,7 @@ import EmptyState from "@/components/EmptyState";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Toast from "react-native-toast-message";
 import { useAppContext } from "@/context/AppContext";
+
 const IPV4 = process.env.EXPO_PUBLIC_IPV4;
 const PORT = process.env.EXPO_PUBLIC_PORT;
 const image_url_base = `http://${IPV4}:${PORT}/storage`;
@@ -26,11 +28,15 @@ const UsersScreen = () => {
     const [filterName, setFilterName] = useState<string>("");
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
-    const [sort, setSort] = useState<string>("id,asc");
+    const [sort, setSort] = useState<string>("id,desc");
     const [visible, setVisible] = useState(false);
     const [itemDelete, setItemDelete] = useState<IUser>();
     const [isRefreshing, setIsRefreshing] = useState(false);
     const { user } = useAppContext();
+
+    // Animation cho sort icon
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const rotateAnim = useRef(new Animated.Value(0)).current;
 
     const createFilter = (filterName: string, filterRole: string) => {
         let filter = "";
@@ -41,12 +47,11 @@ const UsersScreen = () => {
         }
         return filter;
     }
+
     useEffect(() => {
         setIsRefreshing(false);
         const delayDebounce = setTimeout(() => {
-
             const filter = createFilter(filterName, filterRole);
-
             fetchUsers({
                 page,
                 size,
@@ -64,11 +69,18 @@ const UsersScreen = () => {
         sort?: string,
         filter?: string
     }) => {
-        const response = await callGetUsers({ page, size, sort, filter });
-        if (response.data) {
-            setUsers(response.data.result);
+        try {
+            const response = await callGetUsers({ page, size, sort, filter });
+            if (response.data) {
+                setUsers(response.data.result);
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            Toast.show({
+                text1: "Lỗi khi tải danh sách người dùng",
+                type: "error"
+            });
         }
-
     };
 
     const handleSelectedIndex = (index: number) => {
@@ -88,23 +100,53 @@ const UsersScreen = () => {
         router.push({
             pathname: "/management/users/UserDetail",
             params: {
-                userDataStr: JSON.stringify(item)
+               id: item.id
             }
         })
     }
 
+    const handleSortPress = () => {
+        // Animation khi nhấn sort
+        Animated.sequence([
+            Animated.parallel([
+                Animated.timing(scaleAnim, {
+                    toValue: 0.8,
+                    duration: 100,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(rotateAnim, {
+                    toValue: sort === "id,asc" ? 1 : 0,
+                    duration: 200,
+                    useNativeDriver: true,
+                })
+            ]),
+            Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+            })
+        ]).start();
+
+        setSort(sort === "id,asc" ? "id,desc" : "id,asc");
+    };
 
     const handleConfirmDeleteUser = async (item: IUser) => {
         if (item.id) {
-            const response = await callDeleteUser(item.id);
-            if (response.statusCode === 200) {
-                Toast.show({
-                    text1: "Xóa người dùng thành công",
-                    type: "success"
-                });
-                setIsRefreshing(true);
-            }
-            else {
+            try {
+                const response = await callDeleteUser(item.id);
+                if (response.statusCode === 200) {
+                    Toast.show({
+                        text1: "Xóa người dùng thành công",
+                        type: "success"
+                    });
+                    setIsRefreshing(true);
+                } else {
+                    Toast.show({
+                        text1: "Xóa người dùng thất bại",
+                        type: "error"
+                    });
+                }
+            } catch (error) {
                 Toast.show({
                     text1: "Xóa người dùng thất bại",
                     type: "error"
@@ -114,13 +156,15 @@ const UsersScreen = () => {
         setVisible(false);
     }
 
-    
+    // Tính toán rotation cho icon
+    const rotateInterpolate = rotateAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg']
+    });
 
     return (
         <KeyboardAvoidingView behavior="padding" style={styles.container}>
-
             <View style={styles.container}>
-
                 <HeaderList
                     title="Danh sách người dùng"
                     backPress={() => router.back()}
@@ -133,7 +177,6 @@ const UsersScreen = () => {
                         selectedIndex={selectedIndex}
                         onChange={(event) => {
                             handleSelectedIndex(event.nativeEvent.selectedSegmentIndex);
-
                         }}
                         backgroundColor={COLORS.ITEM_BACKGROUND}
                         tintColor={COLORS.BLUE_LIGHT}
@@ -145,15 +188,36 @@ const UsersScreen = () => {
 
                 <View style={styles.searchContainer}>
                     <TouchableOpacity
-                        onPress={() => {
-                            setSort(sort === "id,asc" ? "id,desc" : "id,asc");
-                        }}
+                        onPress={handleSortPress}
+                        style={[
+                            styles.sortButton,
+                            { backgroundColor: sort === "id,desc" ? COLORS.BLUE_LIGHT : COLORS.ITEM_BACKGROUND }
+                        ]}
+                        activeOpacity={0.7}
                     >
-                        <Ionicons
-                            name="swap-vertical"
-                            size={24}
-                            color={sort === "id,asc" ? COLORS.ITEM_TEXT : "orange"} 
-                        />
+                        <Animated.View
+                            style={[
+                                styles.sortIconContainer,
+                                {
+                                    transform: [
+                                        { scale: scaleAnim },
+                                        { rotate: rotateInterpolate }
+                                    ]
+                                }
+                            ]}
+                        >
+                            <MaterialIcons
+                                name="arrow-upward"
+                                size={20}
+                                color={sort === "id,desc" ? "white" : COLORS.ITEM_TEXT}
+                            />
+                        </Animated.View>
+                        <Text style={[
+                            styles.sortText,
+                            { color: sort === "id,desc" ? "white" : COLORS.ITEM_TEXT }
+                        ]}>
+                            {sort === "id,desc" ? "Mới nhất" : "Cũ nhất"}
+                        </Text>
                     </TouchableOpacity>
 
                     <ShareTextInput
@@ -165,38 +229,38 @@ const UsersScreen = () => {
                         inputStyle={styles.inputStyle}
                         containerStyle={styles.inputContainer}
                         icon={<Ionicons name="search" size={24} color={COLORS.ITEM_TEXT} />}
-
                     />
-                    <TouchableOpacity>
+                    
+                    <TouchableOpacity style={styles.filterButton}>
                         <Octicons name="filter" size={24} color={COLORS.ITEM_TEXT} />
                     </TouchableOpacity>
                 </View>
 
                 <FlatList
                     data={users}
-                        renderItem={({ item }) => {
-                           
-                            return <ItemUser
-                                title={item.name}
-                                description={item.phone}
-                                imageUri={item.avatar ? `${image_url_base}/avatar/${item.avatar}` : ""}
-                                editPress={() => handleViewUser(item)}
-                                deletePress={() => {
-                                    setItemDelete(item);
-                                    setVisible(true);
-                                }}
-                                showDelete={item.id !== user?.user?.id}
-                            />
-                        }}
-                        keyExtractor={item => item.id || ""}
-                        ListEmptyComponent={<EmptyState title="Không có người dùng" description="Vui lòng thêm người dùng mới" />}
-                        refreshing={isRefreshing}
-                        onRefresh={() => {
-                            setIsRefreshing(true);
-                        }}
-                    />
-                    <ConfirmDialog
-                        visible={visible}
+                    renderItem={({ item }) => {
+                        return <ItemUser
+                            title={item.name}
+                            description={item.phone}
+                            imageUri={item.avatar ? `${image_url_base}/avatar/${item.avatar}` : ""}
+                            editPress={() => handleViewUser(item)}
+                            deletePress={() => {
+                                setItemDelete(item);
+                                setVisible(true);
+                            }}
+                            showDelete={item.id !== user?.user?.id}
+                        />
+                    }}
+                    keyExtractor={item => item.id || ""}
+                    ListEmptyComponent={<EmptyState title="Không có người dùng" description="Vui lòng thêm người dùng mới" />}
+                    refreshing={isRefreshing}
+                    onRefresh={() => {
+                        setIsRefreshing(true);
+                    }}
+                />
+                
+                <ConfirmDialog
+                    visible={visible}
                     title="Xóa người dùng"
                     message="Bạn có chắc chắn muốn xóa người dùng này không?"
                     onConfirm={() => {
@@ -206,10 +270,7 @@ const UsersScreen = () => {
                     }}
                     onCancel={() => setVisible(false)}
                 />
-
-
             </View>
-
         </KeyboardAvoidingView>
     );
 };
@@ -233,19 +294,39 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         backgroundColor: COLORS.BACKGROUND,
     },
-    listContainer: {
-        flex: 1,
-        padding: 16,
-    },
     inputStyle: {
         backgroundColor: COLORS.ITEM_BACKGROUND,
         paddingHorizontal: 30,
         color: COLORS.ITEM_TEXT,
-
     },
     inputContainer: {
         marginVertical: 0,
-        width: "80%",
+        flex: 1,
+        marginHorizontal: 12,
+    },
+    sortButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: COLORS.BLUE_LIGHT,
+        minWidth: 90,
+    },
+    sortIconContainer: {
+        marginRight: 4,
+    },
+    sortText: {
+        fontSize: 12,
+        fontWeight: "500",
+    },
+    filterButton: {
+        padding: 8,
+    },
+    listContainer: {
+        flex: 1,
+        padding: 16,
     },
     footerContainer: {
         padding: 16,

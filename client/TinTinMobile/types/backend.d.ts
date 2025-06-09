@@ -73,20 +73,20 @@ export interface IRole {
   name: string;
   description: string;
   active: boolean;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  updatedBy: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
   permissions: {
     id: string;
     name: string;
     apiPath: string;
     method: string;
     module: string;
-    createdAt: string;
-    updatedAt: string;
-    createdBy: string;
-    updatedBy: string;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: string;
+    updatedBy?: string;
   }[];
 }
 
@@ -109,8 +109,25 @@ export interface IAddressUser {
   };
 }
 
+export interface IAddressUserRes {
+  id: string;
+  addressLine: string;
+  ward: string;
+  district: string;
+  province: string;
+  receiverName: string;
+  receiverPhone: string;
+  description: string;
+  defaultAddress: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+    
+}
+
 export interface ICoupon {
-  id?: number;
+  id?: string;
   code: string;
   description: string;
   image: string;
@@ -130,52 +147,38 @@ export interface ICoupon {
 
 }
 
-export interface IOrder {
-  id: string;
-  date: string;
-  status: string;
-  items: Array<{
-    name: string;
-    quantity: number;
-    price: string;
-    size: string;
-    ice: string;
-    sugar: string;
-    toppings: Array<string>;
-    toppingPrice: number;
-  }>;
-  total: string;
-}
-
-export interface IProduct {
+export interface ICategory {
   id: string;
   name: string;
-  price: string;
-  description?: string;
-  image?: string;
-  category?: string;
-  rating?: number;
-  likes?: number;
+  active: boolean;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
-export interface ICartItem {
+export interface ISize {
   id: string;
   name: string;
-  quantity: number;
-  price: string;
-  size: string;
-  ice: string;
-  sugar: string;
-  toppings: string[];
-  toppingPrice: number;
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
-export interface IPayment {
+export interface ITopping {
   id: string;
-  orderId: string;
-  method: string;
-  amount: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+  status: ToppingStatus;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
 }
+
+
