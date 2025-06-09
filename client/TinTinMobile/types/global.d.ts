@@ -33,6 +33,6 @@ declare module 'axios' {
 }
 
 export type RootStackParamList = {
-    Home: undefined; // màn hình Home không truyền params
-    CouponDetail: { couponData: ICoupon }; // màn hình CouponDetail truyền params couponData kiểu ICoupon
+    Home: undefined; 
+    CouponDetail: { couponData: ICoupon };
   };
