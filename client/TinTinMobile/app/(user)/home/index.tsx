@@ -1,19 +1,33 @@
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, TextInput, FlatList, Dimensions, Clipboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
-import { useState, useMemo } from 'react';
+import { AntDesign, FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { router } from 'expo-router';
 import { useFavorites } from '@/context/FavoritesContext';
-import { useAppContext } from '@/context/AppContext';
-import { callGetProducts, callGetToppings, callGetProductFavoritesOfUser, callGetToppingFavoritesOfUser } from '@/config/api';
+import Toast from 'react-native-toast-message';
 
-const IPV4 = process.env.EXPO_PUBLIC_IPV4;
-const PORT = process.env.EXPO_PUBLIC_PORT;
-const image_url_base = `http://${IPV4}:${PORT}/storage`;
+// TODO: API Integration Notes
+// 1. Products API:
+//    - GET /api/products - Lấy danh sách sản phẩm
+//    - GET /api/products/categories - Lấy danh mục sản phẩm
+//    - GET /api/products/toppings - Lấy danh sách topping
+//    - GET /api/products/search?q={query} - Tìm kiếm sản phẩm
+
+// 2. Banner API:
+//    - GET /api/banners - Lấy danh sách banner
+
+// 3. Discount API:
+//    - GET /api/coupons - Lấy danh sách mã giảm giá
+//    - POST /api/coupons/apply - Áp dụng mã giảm giá
+
+// 4. Favorites API:
+//    - GET /api/favorites - Lấy danh sách sản phẩm yêu thích
+//    - POST /api/favorites/{productId} - Thêm/xóa sản phẩm yêu thích
 
 export const allProducts = [
+  // TODO: Replace with API data
   // Cà phê
   { id: 1, name: 'Cà phê nóng', subtitle: 'Cà phê nguyên chất', image: require('@/assets/Food/Hotcoffee.jpg'), price: '25.000', rating: 4.5, category: 'Cà phê' },
   { id: 2, name: 'Cà phê đá', subtitle: 'Cà phê thêm đá', image: require('@/assets/Food/Coffee.jpg'), price: '25.000', rating: 4.2, category: 'Cà phê' },
@@ -49,6 +63,7 @@ export const allProducts = [
 ];
 
 export const toppings = [
+  // TODO: Replace with API data
   { id: 1, name: 'Trân châu đen', subtitle: 'Trân châu giòn ngon', image: require('@/assets/Food/Tranchauden.webp'), price: '3.000' },
   { id: 2, name: 'Thạch dừa', subtitle: 'Thạch dừa siêu ngọt', image: require('@/assets/Food/Thach.webp'), price: '3.000' },
   { id: 3, name: 'Sương sáo', subtitle: 'Sương sáo dai ngọt', image: require('@/assets/Food/Sao.jpg'), price: '3.000' },
@@ -57,76 +72,139 @@ export const toppings = [
   { id: 6, name: 'Sữa đặc', subtitle: 'Sữa đặc ngọt ngào', image: require('@/assets/Food/Milk.jpg'), price: '3.000' },
 ];
 
-const categories = ['All', 'Cà phê', 'Trà', 'Trà sữa', 'Sinh tố', 'Nước ép', 'Đá xay', 'Topping'];
+const categories = [
+  // TODO: Replace with API data
+  'All', 'Cà phê', 'Trà', 'Trà sữa', 'Sinh tố', 'Nước ép', 'Đá xay', 'Topping'
+];
+
+const banners = [
+  // TODO: Replace with API data
+  require('@/assets/banner/banner1.jpg'),
+  require('@/assets/banner/banner2.jpg'),
+  require('@/assets/banner/banner3.png'),
+  require('@/assets/banner/banner4.png'),
+];
+
+const discountData = [
+  // TODO: Replace with API data
+  {
+    id: 1,
+    image: require('@/assets/discount/discount1.jpg'),
+    code: 'TINTIN50',
+    details: 'Giảm 50% cho đơn hàng từ 100.000đ',
+    status: 'Còn hạn',
+    expiryDate: '31/12/2025'
+  },
+  {
+    id: 2,
+    image: require('@/assets/discount/discount2.jpg'),
+    code: 'TINTIN30',
+    details: 'Giảm 30% cho đơn hàng từ 50.000đ',
+    status: 'Còn hạn',
+    expiryDate: '01/12/2025'
+  },
+  {
+    id: 3,
+    image: require('@/assets/discount/discount3.jpg'),
+    code: 'TINTIN20',
+    details: 'Giảm 20% cho đơn hàng từ 30.000đ',
+    status: 'Còn hạn',
+    expiryDate: '31/12/2028'
+  },
+  {
+    id: 4,
+    image: require('@/assets/discount/discount4.jpg'),
+    code: 'TINTIN10',
+    details: 'Giảm 10% cho đơn hàng từ 20.000đ',
+    status: 'Còn hạn',
+    expiryDate: '31/10/2025'
+  },
+  {
+    id: 5,
+    image: require('@/assets/discount/discount5.jpg'),
+    code: 'TINTIN15',
+    details: 'Giảm 15% cho đơn hàng từ 40.000đ',
+    status: 'Còn hạn',
+    expiryDate: '20/12/2025'
+  },
+  {
+    id: 6,
+    image: require('@/assets/discount/discount6.jpg'),
+    code: 'TINTIN25',
+    details: 'Giảm 25% cho đơn hàng từ 60.000đ',
+    status: 'Còn hạn',
+    expiryDate: '31/12/2025'
+  },
+  {
+    id: 7,
+    image: require('@/assets/discount/discount7.jpg'),
+    code: 'TINTIN40',
+    details: 'Giảm 40% cho đơn hàng từ 80.000đ',
+    status: 'Còn hạn',
+    expiryDate: '31/12/2025'
+  },
+  {
+    id: 8,
+    image: require('@/assets/discount/discount8.jpg'),
+    code: 'TINTIN60',
+    details: 'Giảm 60% cho đơn hàng từ 150.000đ',
+    status: 'Còn hạn',
+    expiryDate: '31/12/2025'
+  },
+];
 
 export default function HomeScreen() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchText, setSearchText] = useState('');
-  const [products, setProducts] = useState(allProducts);
-  const [toppingsData, setToppingsData] = useState(toppings);
-  const { user } = useAppContext();
-  const {
-    favorites,
-    favoriteToppings,
-    toggleFavorite,
-    toggleFavoriteTopping,
-    setFavoritesList,
-    setFavoriteToppingsList,
-  } = useFavorites();
+  const [activeBanner, setActiveBanner] = useState(0);
+  const bannerScrollRef = useRef<ScrollView>(null);
+  const mainScrollRef = useRef<ScrollView>(null);
+  const discountSectionRef = useRef<View>(null);
+  const { favorites, favoriteToppings, toggleFavorite, toggleFavoriteTopping } = useFavorites();
 
+  // TODO: Add useEffect to fetch data from APIs
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [productRes, toppingRes] = await Promise.all([
-          callGetProducts({}),
-          callGetToppings({}),
-        ]);
-
-        if (productRes.data) {
-          const mapped = productRes.data.map((p: any) => ({
-            id: Number(p.id),
-            name: p.name,
-            subtitle: p.description || '',
-            image: { uri: `${image_url_base}/product/${p.image}` },
-            price: '0',
-            rating: 0,
-            category: p.category?.name || '',
-          }));
-          setProducts(mapped);
-        }
-
-        if (toppingRes.data) {
-          const mappedT = toppingRes.data.map((t: any) => ({
-            id: Number(t.id),
-            name: t.name,
-            subtitle: t.description || '',
-            image: { uri: `${image_url_base}/topping/${t.image}` },
-            price: t.price?.toString() || '0',
-          }));
-          setToppingsData(mappedT);
-        }
-
-        if (user?.user.id) {
-          const [favProdRes, favTopRes] = await Promise.all([
-            callGetProductFavoritesOfUser(user.user.id),
-            callGetToppingFavoritesOfUser(user.user.id),
-          ]);
-          if (favProdRes.data) {
-            setFavoritesList(favProdRes.data.map((f: any) => Number(f.product.id)));
-          }
-          if (favTopRes.data) {
-            setFavoriteToppingsList(favTopRes.data.map((f: any) => Number(f.topping.id)));
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching home data', error);
-      }
-    };
-    fetchData();
+    // Fetch products
+    // Fetch categories
+    // Fetch banners
+    // Fetch discounts
+    // Fetch favorites
   }, []);
 
+  // Auto scroll banner
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const nextBanner = (activeBanner + 1) % banners.length;
+      bannerScrollRef.current?.scrollTo({
+        x: nextBanner * Dimensions.get('window').width,
+        animated: true,
+      });
+      setActiveBanner(nextBanner);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [activeBanner]);
+
+  const handlePrevBanner = () => {
+    const prevBanner = (activeBanner - 1 + banners.length) % banners.length;
+    bannerScrollRef.current?.scrollTo({
+      x: prevBanner * Dimensions.get('window').width,
+      animated: true,
+    });
+    setActiveBanner(prevBanner);
+  };
+
+  const handleNextBanner = () => {
+    const nextBanner = (activeBanner + 1) % banners.length;
+    bannerScrollRef.current?.scrollTo({
+      x: nextBanner * Dimensions.get('window').width,
+      animated: true,
+    });
+    setActiveBanner(nextBanner);
+  };
+
   const filteredProducts = useMemo(() => {
-    let filtered = products;
+    let filtered = allProducts;
     
     // Filter by category
     if (activeCategory !== 'All') {
@@ -145,7 +223,7 @@ export default function HomeScreen() {
     return filtered;
   }, [activeCategory, searchText]);
 
-  const renderProductItem = ({ item }: { item: any }) => (
+  const renderProductItem = ({ item }: { item: typeof allProducts[0] }) => (
     <TouchableOpacity style={styles.productCard}>
       <Image source={item.image} style={styles.productImage} />
       <TouchableOpacity 
@@ -174,7 +252,7 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
-  const renderToppingItem = ({ item }: { item: any }) => (
+  const renderToppingItem = ({ item }: { item: typeof toppings[0] }) => (
     <TouchableOpacity style={styles.toppingCard}>
       <Image source={item.image} style={styles.toppingImage} />
       <TouchableOpacity 
@@ -199,7 +277,7 @@ export default function HomeScreen() {
     if (activeCategory === 'Topping') {
       return (
         <FlatList
-          data={toppingsData}
+          data={toppings}
           renderItem={renderToppingItem}
           keyExtractor={(item) => item.id.toString()}
           horizontal={false} 
@@ -220,6 +298,126 @@ export default function HomeScreen() {
         />
       );
     }
+  };
+
+  const handleBannerPress = () => {
+    discountSectionRef.current?.measure((x, y, width, height, pageX, pageY) => {
+      mainScrollRef.current?.scrollTo({
+        y: pageY,
+        animated: true
+      });
+    });
+  };
+
+  const renderBanner = () => {
+    return (
+      <View style={styles.bannerContainer}>
+        <ScrollView
+          ref={bannerScrollRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={(event) => {
+            const slide = Math.ceil(
+              event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width
+            );
+            if (slide !== activeBanner) {
+              setActiveBanner(slide);
+            }
+          }}
+        >
+          {banners.map((banner, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={handleBannerPress}
+              activeOpacity={0.9}
+            >
+              <Image
+                source={banner}
+                style={styles.bannerImage}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        
+        {/* Navigation Buttons */}
+        <TouchableOpacity 
+          style={[styles.navButton, styles.leftButton]} 
+          onPress={handlePrevBanner}
+        >
+          <AntDesign name="left" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.navButton, styles.rightButton]} 
+          onPress={handleNextBanner}
+        >
+          <AntDesign name="right" size={24} color="white" />
+        </TouchableOpacity>
+
+        <View style={styles.pagination}>
+          {banners.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.paginationDot,
+                index === activeBanner && styles.paginationDotActive,
+              ]}
+            />
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const handleCopyCode = (code: string) => {
+    Clipboard.setString(code);
+    Toast.show({
+      type: 'success',
+      text1: 'Sao chép thành công',
+      text2: `Mã ${code} đã được sao chép vào clipboard`,
+      position: 'bottom',
+      visibilityTime: 2000,
+    });
+  };
+
+  const renderDiscountSection = () => {
+    return (
+      <View ref={discountSectionRef} style={styles.discountSection}>
+        <Text style={styles.sectionTitle}>Mã giảm giá</Text>
+        <FlatList
+          data={discountData}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.discountCard}>
+              <Image source={item.image} style={styles.discountImage} resizeMode="cover" />
+              <View style={styles.discountInfo}>
+                <View style={styles.codeContainer}>
+                  <Text style={styles.discountCode}>{item.code}</Text>
+                  <TouchableOpacity 
+                    style={styles.copyButton}
+                    onPress={() => handleCopyCode(item.code)}
+                  >
+                    <MaterialIcons name="content-copy" size={20} color={COLORS.PRIMARY} />
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.discountDetails}>{item.details}</Text>
+                <View style={styles.discountFooter}>
+                  <View style={styles.statusContainer}>
+                    <View style={[styles.statusDot, { backgroundColor: '#4CAF50' }]} />
+                    <Text style={styles.statusText}>{item.status}</Text>
+                  </View>
+                  <Text style={styles.expiryDate}>HSD: {item.expiryDate}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.discountList}
+        />
+      </View>
+    );
   };
 
   return (
@@ -245,6 +443,13 @@ export default function HomeScreen() {
         />
       </View>
 
+      <ScrollView 
+        ref={mainScrollRef}
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+      >
+        {renderBanner()}
+
       <View style={styles.categoriesContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((category) => (
@@ -262,15 +467,13 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {renderContent()}
 
-        {}
-        {activeCategory !== 'Topping' && toppingsData.length > 0 && (
+        {activeCategory !== 'Topping' && toppings.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Topping kèm theo</Text>
             <FlatList
-              data={toppingsData}
+              data={toppings}
               renderItem={renderToppingItem}
               keyExtractor={(item) => item.id.toString()}
               horizontal
@@ -279,6 +482,8 @@ export default function HomeScreen() {
             />
           </>
         )}
+
+        {renderDiscountSection()}
       </ScrollView>
     </SafeAreaView>
   );
@@ -357,7 +562,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: 8,
   },
   row: {
     justifyContent: 'space-between',
@@ -470,4 +674,120 @@ const styles = StyleSheet.create({
     padding: 8,
     zIndex: 1,
   },
+  bannerContainer: {
+    height: 180,
+    marginBottom: 16,
+    position: 'relative',
+    paddingHorizontal: 16,
+  },
+  bannerImage: {
+    width: Dimensions.get('window').width - 32,
+    height: 180,
+    borderRadius: 12,
+  },
+  navButton: {
+    position: 'absolute',
+    top: '50%',
+    transform: [{ translateY: -20 }],
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 20,
+    padding: 8,
+    zIndex: 2,
+  },
+  leftButton: {
+    left: 26,
+  },
+  rightButton: {
+    right: 26,
+  },
+  pagination: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 15,
+    alignSelf: 'center',
+  },
+  paginationDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    marginHorizontal: 3,
+  },
+  paginationDotActive: {
+    backgroundColor: COLORS.PRIMARY,
+  },
+  discountSection: {
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  discountCard: {
+    backgroundColor: COLORS.ITEM_BACKGROUND,
+    borderRadius: 12,
+    marginHorizontal: 8,
+    marginBottom: 16,
+    width: 280,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  discountImage: {
+    width: '100%',
+    height: 120,
+  },
+  discountInfo: {
+    padding: 12,
+  },
+  codeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  discountCode: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.PRIMARY,
+  },
+  copyButton: {
+    padding: 4,
+  },
+  discountDetails: {
+    fontSize: 14,
+    color: COLORS.TEXT,
+    marginBottom: 8,
+  },
+  discountFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    color: '#4CAF50',
+  },
+  expiryDate: {
+    fontSize: 12,
+    color: COLORS.ITEM_TEXT,
+  },
+  discountList: {
+    paddingHorizontal: 8,
+    marginBottom: 20,
+  },
 });
+

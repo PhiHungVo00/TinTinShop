@@ -3,57 +3,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '@/util/constant';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useOrders } from '@/context/OrderContext';
-import { useAppContext } from '@/context/AppContext';
-import { callGetOrders } from '@/config/api';
-
-interface Order {
-  id: string;
-  date: string;
-  status: string;
-  items: Array<{
-    name: string;
-    quantity: number;
-    price: string;
-    size: string;
-    ice: string;
-    sugar: string;
-    toppings: Array<string>;
-    toppingPrice: number;
-  }>;
-  total: string;
-}
+import { IOrderRes } from '@/types/order';
 
 export default function OrdersScreen() {
-  const { orders, updateOrderStatus, setOrdersList } = useOrders();
-  const { user } = useAppContext();
+  const { orders, updateOrderStatus } = useOrders();
 
   console.log('Current orders in OrdersScreen:', orders);
 
   // Refresh orders when screen is focused
   useFocusEffect(
     useCallback(() => {
-      const fetchOrders = async () => {
-        if (!user?.user.id) return;
-        try {
-          const res = await callGetOrders({ filter: `user.id:${user.user.id}` });
-          if (res.data) {
-            const mapped = res.data.map((o: any) => ({
-              id: o.id,
-              date: o.createdAt || '',
-              status: o.status,
-              items: o.orderDetails || [],
-              total: o.finalPrice?.toString() || '0',
-            }));
-            setOrdersList(mapped);
-          }
-        } catch (error) {
-          console.error('Error fetching orders', error);
-        }
-      };
-      fetchOrders();
-    }, [user?.user.id])
+      // TODO: Cần tích hợp API để lấy danh sách đơn hàng thực tế của user.
+      // Đảm bảo rằng khi không có đơn hàng, mảng `orders` được set là rỗng []
+      // để phần "Chưa có đơn hàng nào" hiển thị đúng.
+      // const fetchOrders = async () => {
+      //   const response = await callGetOrders();
+      //   setOrders(response.data); // Nếu không có đơn hàng, response.data nên là []
+      // };
+      // fetchOrders();
+    }, [])
   );
 
   const handlePaymentPress = (orderId: string) => {
@@ -61,7 +31,7 @@ export default function OrdersScreen() {
     if (orderToPay) {
       router.push({
         pathname: '/(user)/payment',
-        params: { orderId, total: orderToPay.total }
+        params: { orderId, total: orderToPay.finalPrice.toString() }
       });
       // TODO: Gọi API cập nhật trạng thái đơn hàng sau khi thanh toán
       // const updateOrder = async () => {
@@ -83,40 +53,47 @@ export default function OrdersScreen() {
       <ScrollView style={styles.scrollView}>
         {orders.length > 0 ? (
           <View style={styles.ordersList}>
-            {orders.map((order) => (
+            {orders.map((order: IOrderRes) => (
               <TouchableOpacity key={order.id} style={styles.orderCard}>
                 <View style={styles.orderHeader}>
-                  <Text style={styles.orderId}>Đơn hàng #{order.id}</Text>
-                  {/* <Text style={[
-                    styles.orderStatus,
-                    { color: order.status === 'Đã hoàn thành' ? COLORS.SUCCESS : COLORS.PRIMARY }
-                  ]}>
-                    {order.status}
-                  </Text> */}
+                  <Text style={styles.orderId}>Đơn hàng #{order.id.slice(0, 10)}...</Text>
                 </View>
                 <View style={styles.orderDate}>
                   <AntDesign name="calendar" size={16} color={COLORS.ITEM_TEXT} />
-                  <Text style={styles.dateText}>{order.date}</Text>
+                  <Text style={styles.dateText}>{order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN') : 'N/A'}</Text>
                 </View>
+                {order.note && (
+                  <View style={styles.noteInfo}>
+                    <AntDesign name="message1" size={16} color={COLORS.ITEM_TEXT} />
+                    <Text style={styles.noteText}>{order.note}</Text>
+                  </View>
+                )}
                 <View style={styles.orderItems}>
-                  {order.items.map((item, index) => (
+                  {order.orderDetails.map((item, index) => (
                     <View key={index} style={styles.orderItem}>
-                      <Text style={styles.itemName}>{item.name} x{item.quantity}</Text>
-                      <Text style={styles.itemPrice}>{item.price}</Text>
+                      <Text style={styles.itemName}>{item.productSizeId} x{item.quantity}</Text>
+                      <Text style={styles.itemPrice}>{item.price.toLocaleString('vi-VN')} VNĐ</Text>
                       <View style={styles.itemDetails}>
-                        <Text style={styles.itemDetailText}>Size: {item.size}</Text>
-                        <Text style={styles.itemDetailText}>Đá: {item.ice}</Text>
-                        <Text style={styles.itemDetailText}>Đường: {item.sugar}</Text>
-                        {item.toppings.length > 0 && (
-                          <Text style={styles.itemDetailText}>Topping: {item.toppings.join(', ')} ({item.toppingPrice.toLocaleString('vi-VN')} VNĐ)</Text>
-                        )}
+                        <Text style={styles.itemDetailText}>Topping: {item.toppingIds.join(', ')}</Text>
                       </View>
                     </View>
                   ))}
                 </View>
                 <View style={styles.orderTotal}>
-                  <Text style={styles.totalLabel}>Tổng cộng:</Text>
-                  <Text style={styles.totalAmount}>{order.total}</Text>
+                  <Text style={styles.totalLabel}>Tổng tiền hàng:</Text>
+                  <Text style={styles.totalAmount}>{order.totalPrice.toLocaleString('vi-VN')} VNĐ</Text>
+                </View>
+                {order.couponId && (
+                  <View style={styles.discountInfo}>
+                    <Text style={styles.discountLabel}>Giảm giá:</Text>
+                    <Text style={styles.discountAmount}>
+                      -{(order.totalPrice - order.finalPrice).toLocaleString('vi-VN')} VNĐ
+                    </Text>
+                  </View>
+                )}
+                <View style={styles.finalTotal}>
+                  <Text style={styles.finalTotalLabel}>Thành tiền:</Text>
+                  <Text style={styles.finalTotalAmount}>{order.finalPrice.toLocaleString('vi-VN')} VNĐ</Text>
                 </View>
                 {order.status === 'Chưa thanh toán' ? (
                   <TouchableOpacity 
@@ -185,10 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.TEXT,
-  },
-  orderStatus: {
-    fontSize: 14,
-    fontWeight: '500',
+    flexShrink: 1,
   },
   orderDate: {
     flexDirection: 'row',
@@ -281,5 +255,49 @@ const styles = StyleSheet.create({
     color: COLORS.SUCCESS,
     fontSize: 16,
     fontWeight: '600',
+  },
+  noteInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  noteText: {
+    flex: 1,
+    marginLeft: 8,
+    color: COLORS.ITEM_TEXT,
+    fontSize: 14,
+    fontStyle: 'italic',
+  },
+  discountInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  discountLabel: {
+    fontSize: 14,
+    color: COLORS.ITEM_TEXT,
+  },
+  discountAmount: {
+    fontSize: 14,
+    color: COLORS.SUCCESS,
+  },
+  finalTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.ITEM_BORDER,
+  },
+  finalTotalLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.TEXT,
+  },
+  finalTotalAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.PRIMARY,
   },
 });

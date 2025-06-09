@@ -7,6 +7,7 @@ import { AppProvider } from "@/context/AppContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { CartProvider } from "@/context/CartContext";
+import { DiscountProvider } from "@/context/DiscountContext";
 import { COLORS } from "@/util/constant";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
@@ -41,11 +42,13 @@ export default function RootLayout() {
           <FavoritesProvider>
             <OrderProvider>
               <CartProvider>
+                <DiscountProvider>
                 <StatusBar hidden />
                 <Stack screenOptions={{ headerShown: false }} />
                 <WithLoadingHandler />
                 <LoadingModal />
                 <Toast config={toastConfig} />
+                </DiscountProvider>
               </CartProvider>
             </OrderProvider>
           </FavoritesProvider>
