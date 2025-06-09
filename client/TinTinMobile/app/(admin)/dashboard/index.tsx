@@ -428,11 +428,21 @@ const Dashboard: React.FC = () => {
   };
 
   const handleProductPress = (productId: string) => {
-    // router.push(`/product/${productId}`);
+    router.push({
+        pathname: '/management/products/ProductDetail',
+        params: {
+            id: productId
+        }
+    })
   };
 
   const handleCustomerPress = (customerId: string) => {
-    // router.push(`/user/${customerId}`);
+    router.push({
+        pathname: '/management/orders/OrderUser',
+        params: {
+            id: customerId
+        }
+    })
   };
 
   const StatCard: React.FC<{
@@ -559,7 +569,7 @@ const Dashboard: React.FC = () => {
             title="Người dùng hoạt động"
             value={stats.totalUsers}
             icon="people-outline"
-            gradient={[COLORS.SUCCESS, COLORS.SUCCESS_BACKGROUND]}
+            gradient={[COLORS.SUCCESS, COLORS.SUCCESS]}
           />
         </View>
 
