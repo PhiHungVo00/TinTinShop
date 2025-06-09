@@ -231,6 +231,9 @@ export const callDeleteProductSize = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/variants/${id}`);
 }
 
+export const callGetProductSizeById = (id: string) => {
+    return axios.get<IBackendRes<IProductSizeRes>>(`/api/v1/variants/${id}`);
+}
 /**
  * 
 Module topping
@@ -284,7 +287,9 @@ export const callDeleteOrder = (id: string) => {
     return axios.delete<IBackendRes<IOrderRes>>(`/api/v1/orders/${id}`);
 }
 
-
+export const callGetOrderById = (id: string) => {
+    return axios.get<IBackendRes<IOrderRes>>(`/api/v1/orders/${id}`);
+}
 
 
 /**

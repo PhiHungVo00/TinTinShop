@@ -87,7 +87,6 @@ const CreateToppingScreen = () => {
     const handleCreateTopping = async (values: any) => {
         console.log(values);
         
-        // Upload ảnh nếu có
         let finalImageFileName = imageFileName;
         if (imageFileName.length > 0 && imageUri.length > 0) {
             const formData = new FormData();
@@ -156,7 +155,7 @@ const CreateToppingScreen = () => {
                 <ScrollView>
                     <View style={styles.imageWrapper}>
                         <Image
-                            source={{ uri: imageUri }}
+                            source={{ uri: imageUri  || 'https://via.placeholder.com/100x100?text=No+Image' }}
                             style={styles.image}
                         />
                         <Pressable
