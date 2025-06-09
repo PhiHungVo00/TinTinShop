@@ -1,8 +1,10 @@
 plugins {
-	java
-	id("org.springframework.boot") version "3.4.5"
-	id("io.spring.dependency-management") version "1.1.7"
+        java
+        id("org.springframework.boot") version "3.4.5"
+        id("io.spring.dependency-management") version "1.1.7"
 }
+
+import org.gradle.jvm.toolchain.JavaToolchainService
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
@@ -43,5 +45,11 @@ dependencies {
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+        useJUnitPlatform()
+        val javaToolchains: JavaToolchainService by project
+        javaLauncher.set(
+                javaToolchains.launcherFor {
+                        languageVersion.set(JavaLanguageVersion.of(17))
+                }
+        )
 }

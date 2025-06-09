@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Run backend tests
+        run: |
+          cd server/TinTin/TinTin
+          chmod +x gradlew
+          ./gradlew test
+      - name: Run frontend tests
+        run: |
+          cd client/TinTinMobile && npm ci && npm test --if-present
+          cd ../TinTinWeb/TinTinWeb && npm ci && npm test --if-present
