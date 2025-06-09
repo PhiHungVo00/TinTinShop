@@ -27,7 +27,8 @@ public class OrderRequestDTO {
 
     private String note;
 
-    @NotEmpty(message = "Order details cannot be empty")
+    private Boolean useCart = false;
+
     private List<OrderDetailDTO> orderDetails;
 
     @Getter

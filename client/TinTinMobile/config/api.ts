@@ -5,6 +5,7 @@ import { IProductSizeReq, IProductSizeRes } from "@/types/productSize"
 import { IProductFavoriteReq, IProductFavoriteRes, IToppingFavoriteReq, IToppingFavoriteRes } from "@/types/favorite"
 import { IOrderReq, IOrderRes, IOrderUpdate } from "@/types/order"
 import { IOrderDetailRes } from "@/types/orderDetail"
+import { ICart, ICartItem, ICartItemReq, ICartItemUpdate } from "@/types/cart"
 
 /**
  * 
@@ -300,6 +301,29 @@ Module order detail
 export const callGetOrderDetailsByOrderId = (id: string) => {
     return axios.get<IBackendRes<IOrderDetailRes[]>>(`/api/v1/orders/${id}/details`);
 }
+/**
+ * Module cart
+ */
+export const callGetCartByUser = (id: string) => {
+    return axios.get<IBackendRes<ICart>>(`/api/v1/carts/users/${id}`);
+};
+
+export const callAddCartItem = (payload: ICartItemReq) => {
+    return axios.post<IBackendRes<ICartItem>>(`/api/v1/carts/items`, payload);
+};
+
+export const callUpdateCartItem = (payload: ICartItemUpdate) => {
+    return axios.put<IBackendRes<ICartItem>>(`/api/v1/carts/items`, payload);
+};
+
+export const callDeleteCartItem = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/carts/items/${id}`);
+};
+
+export const callClearCart = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/carts/users/${id}`);
+};
+
 
 /**
  * 

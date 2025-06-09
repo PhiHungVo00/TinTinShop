@@ -4,10 +4,7 @@ import com.example.TinTin.domain.*;
 import com.example.TinTin.domain.request.order.OrderRequestDTO;
 import com.example.TinTin.domain.request.order.OrderUpdateDTO;
 import com.example.TinTin.domain.response.order.OrderResponseDTO;
-import com.example.TinTin.repository.AddressUserRepository;
-import com.example.TinTin.repository.CouponRepository;
-import com.example.TinTin.repository.OrderRepository;
-import com.example.TinTin.repository.UserRepository;
+import com.example.TinTin.repository.*;
 import com.example.TinTin.util.constrant.DiscountTypeEnum;
 import com.example.TinTin.util.constrant.OrderStatusEnum;
 import com.example.TinTin.util.error.IdInvalidException;
@@ -28,16 +25,22 @@ public class OrderService {
     private final CouponRepository couponRepository;
     private final OrderDetailService orderDetailService;
     private final AddressUserRepository addressUserRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
     public OrderService(OrderRepository orderRepository, UserRepository userRepository,
                         CouponRepository couponRepository,
                         OrderDetailService orderDetailService,
-                        AddressUserRepository addressUserRepository) {
+                        AddressUserRepository addressUserRepository,
+                        CartRepository cartRepository,
+                        CartItemRepository cartItemRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.couponRepository = couponRepository;
         this.orderDetailService = orderDetailService;
         this.addressUserRepository = addressUserRepository;
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
     }
 
     public BigDecimal calculateFinalPrice(Coupon coupon, BigDecimal totalPrice) {
@@ -79,11 +82,31 @@ public class OrderService {
         AddressUser addressUser = this.addressUserRepository.findById(orderRequestDTO.getAddressId()).orElseThrow(()->{
             return new IdInvalidException("Address not found with id: " + orderRequestDTO.getAddressId());
         });
-        List<OrderDetail> orderDetails = Optional.ofNullable(orderRequestDTO.getOrderDetails())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(orderDetailDTO -> this.orderDetailService.createOrderDetail(orderDetailDTO))
-                .toList();
+
+        List<OrderDetail> orderDetails;
+        if (Boolean.TRUE.equals(orderRequestDTO.getUseCart())) {
+            Cart cart = cartRepository.findByUser(user)
+                    .orElseThrow(() -> new IdInvalidException("Cart not found for user with id: " + user.getId()));
+            List<CartItem> cartItems = cartItemRepository.findAll().stream()
+                    .filter(ci -> ci.getCart().getId().equals(cart.getId()))
+                    .toList();
+            orderDetails = cartItems.stream()
+                    .map(ci -> {
+                        OrderRequestDTO.OrderDetailDTO dto = new OrderRequestDTO.OrderDetailDTO();
+                        dto.setProductSizeId(ci.getProductSize().getId());
+                        dto.setQuantity(ci.getQuantity());
+                        dto.setToppingIds(ci.getToppings().stream().map(Topping::getId).toList());
+                        return orderDetailService.createOrderDetail(dto);
+                    })
+                    .toList();
+            cartItemRepository.deleteAll(cartItems);
+        } else {
+            orderDetails = Optional.ofNullable(orderRequestDTO.getOrderDetails())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .map(orderDetailDTO -> this.orderDetailService.createOrderDetail(orderDetailDTO))
+                    .toList();
+        }
         BigDecimal totalPrice = orderDetails.stream()
                 .map(OrderDetail::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

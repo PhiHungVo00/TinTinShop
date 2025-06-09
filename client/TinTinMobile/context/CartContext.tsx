@@ -1,22 +1,13 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface CartItem {
-  id: string;
-  name: string;
-  quantity: number;
-  price: string;
-  size: string;
-  ice: string;
-  sugar: string;
-  toppings: string[];
-  toppingPrice: number;
-}
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { ICartItem, ICartItemReq, ICartItemUpdate } from '@/types/cart';
+import { callAddCartItem, callClearCart, callDeleteCartItem, callGetCartByUser, callUpdateCartItem } from '@/config/api';
+import { useAppContext } from './AppContext';
 
 interface CartContextType {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (itemId: string) => void;
-  updateItemQuantity: (itemId: string, quantity: number) => void;
+  items: ICartItem[];
+  addItem: (payload: Omit<ICartItemReq, 'userId'>) => Promise<void>;
+  removeItem: (itemId: string) => Promise<void>;
+  updateItemQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => void;
   getTotalPrice: () => number;
 }
@@ -24,50 +15,54 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const { user } = useAppContext();
+  const [items, setItems] = useState<ICartItem[]>([]);
 
-  const addItem = (newItem: CartItem) => {
-    setItems(prevItems => {
-      const existingItemIndex = prevItems.findIndex(item => 
-        item.id === newItem.id && 
-        item.size === newItem.size && 
-        item.ice === newItem.ice && 
-        item.sugar === newItem.sugar &&
-        JSON.stringify(item.toppings) === JSON.stringify(newItem.toppings)
-      );
+  useEffect(() => {
+    if (user?.user.id) {
+      callGetCartByUser(user.user.id as string).then(res => {
+        if (res.data) {
+          setItems(res.data.items);
+        }
+      });
+    }
+  }, [user]);
 
-      if (existingItemIndex > -1) {
-        // If item exists, update quantity
-        const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += newItem.quantity;
-        return updatedItems;
-      } else {
-        // If item doesn't exist, add new item
-        return [...prevItems, newItem];
-      }
-    });
+  const addItem = async (payload: Omit<ICartItemReq, 'userId'>) => {
+    if (!user?.user.id) return;
+    const res = await callAddCartItem({ ...payload, userId: user.user.id });
+    if (res.data) {
+      setItems(prev => [...prev, res.data]);
+    }
   };
 
-  const removeItem = (itemId: string) => {
+  const removeItem = async (itemId: string) => {
+    await callDeleteCartItem(itemId);
     setItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };
 
-  const updateItemQuantity = (itemId: string, quantity: number) => {
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === itemId ? { ...item, quantity } : item
-      )
-    );
+  const updateItemQuantity = async (itemId: string, quantity: number) => {
+    const res = await callUpdateCartItem({ id: itemId, quantity } as ICartItemUpdate);
+    if (res.data) {
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item.id === itemId ? res.data : item
+        )
+      );
+    }
   };
 
   const clearCart = () => {
-    setItems([]);
+    if (user?.user.id) {
+      callClearCart(user.user.id as string).then(() => setItems([]));
+    } else {
+      setItems([]);
+    }
   };
 
   const getTotalPrice = () => {
     return items.reduce((total, item) => {
-      const itemPrice = parseFloat(item.price.replace(/[^\d]/g, ''));
-      return total + (itemPrice * item.quantity) + (item.toppingPrice * item.quantity);
+      return total + item.price * item.quantity;
     }, 0);
   };
 

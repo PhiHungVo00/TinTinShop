@@ -20,6 +20,7 @@ export interface IOrderReq {
     couponId?: string;
     addressId: string;
     note?: string;
+    useCart?: boolean;
     orderDetails: IOderDetailDTO[];
 }
 
