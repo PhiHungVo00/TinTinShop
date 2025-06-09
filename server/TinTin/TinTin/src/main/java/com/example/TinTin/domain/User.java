@@ -44,6 +44,9 @@ public class User {
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
+
+    private Integer failedLoginAttempts;
+    private Boolean accountLocked;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
@@ -73,11 +76,15 @@ public class User {
     public void preCreateUser(){
         this.createdAt = Instant.now();
         this.createdBy = SecurityUtil.getCurrentUserLogin().isPresent()?SecurityUtil.getCurrentUserLogin().get():"";
+        if(this.failedLoginAttempts == null) this.failedLoginAttempts = 0;
+        if(this.accountLocked == null) this.accountLocked = false;
     }
 
     @PreUpdate
     public void preUpdateUser(){
         this.updatedAt = Instant.now();
         this.updatedBy = SecurityUtil.getCurrentUserLogin().isPresent()?SecurityUtil.getCurrentUserLogin().get():"";
+        if(this.failedLoginAttempts == null) this.failedLoginAttempts = 0;
+        if(this.accountLocked == null) this.accountLocked = false;
     }
 }

@@ -17,10 +17,12 @@ import org.aspectj.apache.bcel.classfile.Module;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    @Value("${security.login.max-failed-attempts:5}")
+    private int maxFailedAttempts;
 
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
@@ -71,6 +75,26 @@ public class UserService {
     public User getUserByRefreshTokenAndEmail(String refreshToken, String email) {
         User user = this.userRepository.findByRefreshTokenAndEmail(refreshToken, email);
         return user;
+    }
+
+    public void recordLoginSuccess(User user){
+        if(user != null){
+            user.setFailedLoginAttempts(0);
+            this.userRepository.save(user);
+        }
+    }
+
+    public void recordLoginFailure(String email){
+        User user = this.userRepository.findByEmail(email);
+        if(user != null){
+            int attempts = user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts();
+            attempts++;
+            user.setFailedLoginAttempts(attempts);
+            if(attempts >= maxFailedAttempts){
+                user.setAccountLocked(true);
+            }
+            this.userRepository.save(user);
+        }
     }
 
     public void handleLogout(String email) {
