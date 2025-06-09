@@ -7,6 +7,23 @@ import { useState, useCallback } from 'react';
 import { useOrders } from '@/context/OrderContext';
 import { IOrder } from '@/types/backend';
 
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: string;
+    size: string;
+    ice: string;
+    sugar: string;
+    toppings: Array<string>;
+    toppingPrice: number;
+  }>;
+  total: string;
+}
+
 export default function OrdersScreen() {
   const { orders, updateOrderStatus } = useOrders();
 

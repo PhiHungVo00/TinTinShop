@@ -7,7 +7,6 @@ import { router, useLocalSearchParams } from 'expo-router';
 import Toast from "react-native-toast-message";
 import { useCart } from '@/context/CartContext';
 import { useOrders } from '@/context/OrderContext';
-import { IPayment, IOrder } from '@/types/backend';
 
 const PaymentScreen = () => {
   const { total } = useLocalSearchParams();
@@ -40,7 +39,7 @@ const PaymentScreen = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Tạo đơn hàng mới từ giỏ hàng
-      const newOrder: IOrder = {
+      const newOrder = {
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('vi-VN'),
         status: 'Đã hoàn thành',

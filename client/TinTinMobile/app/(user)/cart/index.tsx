@@ -32,7 +32,7 @@ import { useDiscount } from '@/context/DiscountContext';
 import Toast from 'react-native-toast-message';
 import { useAppContext } from '@/context/AppContext';
 import { callGetUser, getAllAddressOfUser, createAddress } from '@/config/api';
-import { IUser, IAddressUser, ICoupon, ICartItem } from '@/types/backend';
+import { IUser, IAddressUser, ICoupon } from '@/types/backend';
 import { DiscountType } from '@/types/enums/DiscountType.enum';
 
 const discountData: ICoupon[] = [
