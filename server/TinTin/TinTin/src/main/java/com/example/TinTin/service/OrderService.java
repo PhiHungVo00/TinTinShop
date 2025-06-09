@@ -67,53 +67,55 @@ public class OrderService {
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequestDTO) {
         User user = userRepository.findById(orderRequestDTO.getUserId())
                 .orElseThrow(() -> new IdInvalidException("User not found with id: " + orderRequestDTO.getUserId()));
-        Coupon coupon = new Coupon();
-        if(orderRequestDTO.getCouponId() != null){
-             coupon = couponRepository.findById(orderRequestDTO.getCouponId())
-                    .orElseThrow(() -> new IdInvalidException("Coupon not found with id: " + orderRequestDTO.getCouponId()));
-            if (!coupon.getIsActive() || coupon.getEndDate().isBefore(Instant.now())) {
-                throw new IdInvalidException("Coupon is not active with id: " + orderRequestDTO.getCouponId());
-            }
 
-        }
-        AddressUser addressUser = this.addressUserRepository.findById(orderRequestDTO.getAddressId()).orElseThrow(()->{
-            return new IdInvalidException("Address not found with id: " + orderRequestDTO.getAddressId());
-        });
+        AddressUser addressUser = this.addressUserRepository.findById(orderRequestDTO.getAddressId())
+                .orElseThrow(() -> new IdInvalidException("Address not found with id: " + orderRequestDTO.getAddressId()));
+
         List<OrderDetail> orderDetails = Optional.ofNullable(orderRequestDTO.getOrderDetails())
                 .orElse(Collections.emptyList())
                 .stream()
                 .map(orderDetailDTO -> this.orderDetailService.createOrderDetail(orderDetailDTO))
                 .toList();
+
         BigDecimal totalPrice = orderDetails.stream()
                 .map(OrderDetail::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if(coupon.getMinOrderValue().compareTo(totalPrice) > 0){
-            throw new IdInvalidException("Total order value must be greater than or equal to the minimum order value for the coupon.");
+        Order order = new Order();
+        BigDecimal finalPrice;
+        Coupon coupon = null;
+
+        if (orderRequestDTO.getCouponId() != null) {
+            coupon = couponRepository.findById(orderRequestDTO.getCouponId())
+                    .orElseThrow(() -> new IdInvalidException("Coupon not found with id: " + orderRequestDTO.getCouponId()));
+            if (!coupon.getIsActive() || coupon.getEndDate().isBefore(Instant.now())) {
+                throw new IdInvalidException("Coupon is not active with id: " + orderRequestDTO.getCouponId());
+            }
+            if (coupon.getMinOrderValue().compareTo(totalPrice) > 0) {
+                order.setCoupon(null);
+            } else {
+                order.setCoupon(coupon);
+                coupon.setQuantity(coupon.getQuantity() - 1);
+                this.couponRepository.save(coupon);
+            }
         }
 
-        BigDecimal finalPrice = calculateFinalPrice(coupon, totalPrice);
+        finalPrice = (coupon != null && order.getCoupon() != null) ? calculateFinalPrice(coupon, totalPrice) : totalPrice;
 
-        Order order = new Order();
         order.setUser(user);
         order.setOrderDetails(orderDetails);
         order.setTotalPrice(totalPrice);
         order.setFinalPrice(finalPrice);
-        order.setCoupon(coupon);
         order.setAddressUser(addressUser);
         order.setNote(orderRequestDTO.getNote());
         order.setStatus(OrderStatusEnum.PENDING);
 
-        //update coupon usage count
-        coupon.setQuantity(coupon.getQuantity() - 1);
-        this.couponRepository.save(coupon);
         Order savedOrder = this.orderRepository.save(order);
         // Update order details with the saved order
         orderDetails.forEach(orderDetail -> orderDetail.setOrder(savedOrder));
         this.orderDetailService.saveAll(orderDetails);
 
         return OrderMapper.toOrderResponseDTO(savedOrder);
-
     }
 
     public OrderResponseDTO getOrderById(Long id) {
